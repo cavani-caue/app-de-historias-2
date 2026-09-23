@@ -53,6 +53,7 @@ export interface EnredoState {
 
   saveImage: (blob: Blob) => Promise<string>
   setPhaseArt: (key: string, blob: Blob | null) => Promise<void>
+  setSerieCover: (serieId: string, blob: Blob | null) => Promise<void>
 }
 
 async function readAll() {
@@ -86,6 +87,12 @@ async function writeSeed() {
 export const useStore = create<EnredoState>()((set, get) => {
   const touchSerie = (serieId?: string) => {
     if (serieId) get().updateSerie(serieId, { updatedAt: Date.now() })
+  }
+  const dropImage = (id: string) => {
+    const url = get().imageUrls[id]
+    set((s) => { const imageUrls = { ...s.imageUrls }; delete imageUrls[id]; return { imageUrls } })
+    if (url) setTimeout(() => URL.revokeObjectURL(url), 1000)
+    db.images.delete(id)
   }
   const serieOfEpisode = (episodeId: string) => get().episodes.find((e) => e.id === episodeId)?.serieId
 
@@ -235,6 +242,8 @@ export const useStore = create<EnredoState>()((set, get) => {
       return id
     },
     setPhaseArt: async (key, blob) => {
+      const old = get().phaseArt[key]
+      if (old) dropImage(old)
       if (!blob) {
         set((s) => { const phaseArt = { ...s.phaseArt }; delete phaseArt[key]; return { phaseArt } })
         await db.phaseArt.delete(key)
@@ -243,6 +252,12 @@ export const useStore = create<EnredoState>()((set, get) => {
       const imageId = await get().saveImage(blob)
       set((s) => ({ phaseArt: { ...s.phaseArt, [key]: imageId } }))
       await db.phaseArt.put({ key, imageId })
+    },
+    setSerieCover: async (serieId, blob) => {
+      const old = get().series.find((x) => x.id === serieId)?.coverId
+      if (old) dropImage(old)
+      const coverId = blob ? await get().saveImage(blob) : undefined
+      get().updateSerie(serieId, { coverId })
     },
   }
 })

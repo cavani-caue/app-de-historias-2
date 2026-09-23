@@ -136,3 +136,5 @@ export const DURATIONS = [
   { label: '1 semana', hint: 'o padrão', ms: 7 * 864e5 },
   { label: '1 mês', hint: 'esquece de verdade', ms: 30 * 864e5 },
 ]
+
+export const formatForPhase = (p: PhaseId) => (p === 'plan' ? 'Escaleta' : p === 'brainstorm' ? 'Notas' : 'Roteiro')
