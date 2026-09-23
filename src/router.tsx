@@ -9,6 +9,7 @@ import NotFound from './pages/NotFound'
 import PhasePage from './pages/PhasePage'
 import SeriePage from './pages/SeriePage'
 import SeriesPage from './pages/SeriesPage'
+import WritingPage from './pages/WritingPage'
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +31,7 @@ export const router = createBrowserRouter([
           { path: '*', element: <NotFound /> },
         ],
       },
-      { path: 'texto/:docId', element: <Placeholder title="Escrita" etapa={3} /> },
+      { path: 'texto/:docId', element: <WritingPage /> },
     ],
   },
 ])
