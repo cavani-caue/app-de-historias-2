@@ -8,6 +8,8 @@ import EpisodePage from './pages/EpisodePage'
 import NotFound from './pages/NotFound'
 import PhasePage from './pages/PhasePage'
 import SeriePage from './pages/SeriePage'
+import IdeationPage from './pages/IdeationPage'
+import PlanPage from './pages/PlanPage'
 import SeriesPage from './pages/SeriesPage'
 import WritingPage from './pages/WritingPage'
 
@@ -20,10 +22,10 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <SeriesPage /> },
           { path: 'h/:serieId', element: <SeriePage /> },
-          { path: 'h/:serieId/ideias', element: <Placeholder title="Ideação da história" etapa={4} /> },
-          { path: 'h/:serieId/plano', element: <Placeholder title="Planejamento da história" etapa={4} /> },
+          { path: 'h/:serieId/ideias', element: <IdeationPage /> },
+          { path: 'h/:serieId/plano', element: <PlanPage /> },
           { path: 'h/:serieId/ep/:epId', element: <EpisodePage /> },
-          { path: 'h/:serieId/ep/:epId/plano', element: <Placeholder title="Planejamento do episódio" etapa={4} /> },
+          { path: 'h/:serieId/ep/:epId/plano', element: <PlanPage /> },
           { path: 'h/:serieId/ep/:epId/fase/:phaseId', element: <PhasePage /> },
           { path: 'textos', element: <DocsPage /> },
           { path: 'quadro', element: <BoardPage /> },
