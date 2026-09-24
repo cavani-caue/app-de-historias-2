@@ -86,7 +86,7 @@ export function buildSeed(now = Date.now()): SeedData {
     b('action', 'O mato tomou conta do que um dia foi horta.'),
   ]
   const d = (id: string, episodeId: string, phase: Doc['phase'], title: string, format: string, blocks: SimpleBlock[], ageDays: number, lockedUntil?: number): Doc => ({
-    id, episodeId, phase, title, format, content: blocksToDoc(blocks), lockedUntil, createdAt: now - 30 * day + Number(id.slice(1)) * 6e4, updatedAt: now - ageDays * day,
+    id, episodeId, phase, title, format, content: blocksToDoc(blocks), lockedUntil, lockedAt: lockedUntil ? now - 4 * day : undefined, createdAt: now - 30 * day + Number(id.slice(1)) * 6e4, updatedAt: now - ageDays * day,
   })
   const docs: Doc[] = [
     d('d1', 'e1', 'vomit', 'Vomit draft — tentativa 1', 'Roteiro', casa, 1),

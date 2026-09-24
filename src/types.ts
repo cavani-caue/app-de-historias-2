@@ -50,6 +50,10 @@ export interface Doc {
   format: string
   content: PMNode // { type: 'doc', content: [...] }
   lockedUntil?: number
+  /** Quando foi mandado maturar (para a barra de progresso). */
+  lockedAt?: number
+  /** Já avisou que destrancou. */
+  unlockNotified?: boolean
   createdAt: number
   updatedAt: number
 }

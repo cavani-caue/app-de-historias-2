@@ -1,5 +1,5 @@
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react'
-import { ArrowLeft, Clock3, Download, Link2, PanelLeft, Redo2, Undo2, X } from 'lucide-react'
+import { ArrowLeft, Clock3, Download, Link2, Lock, PanelLeft, Redo2, Undo2, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useShallow } from 'zustand/react/shallow'
@@ -10,7 +10,9 @@ import { useClickOutside } from '../hooks/useClickOutside'
 import { LinkPicker } from '../components/LinkPicker'
 import { exportDoc } from '../lib/export'
 import { LINK_KIND, linkDestination, linkPreview, type LinkOption } from '../lib/links'
-import { epNum, pad2, plural } from '../lib/format'
+import { countdown, epNum, pad2, plural, shortLeft } from '../lib/format'
+import { isLocked } from '../lib/selectors'
+import { useNow } from '../hooks/useNow'
 import { useDoc, useStore } from '../store'
 import type { BlockType, Doc, LinkTarget } from '../types'
 
@@ -75,10 +77,52 @@ export default function WritingPage() {
         </div>
       </div>
     )
-  return <Writer key={doc.id} doc={doc} />
+  return <LockGate key={doc.id} doc={doc} />
 }
 
-function Writer({ doc }: { doc: Doc }) {
+/** Texto em maturação: some da tela até a data. "Ver mesmo assim" abre só leitura. */
+function LockGate({ doc }: { doc: Doc }) {
+  const navigate = useNavigate()
+  const now = useNow()
+  const [params] = useSearchParams()
+  const peek = params.get('espiar') === '1'
+  const locked = isLocked(doc, now)
+  const ep = useStore((s) => s.episodes.find((e) => e.id === doc.episodeId))
+  if (!locked) return <Writer doc={doc} />
+  if (peek) return <Writer doc={doc} readOnly />
+  const c = countdown(doc.lockedUntil!, now)
+  const back = () => navigate(ep ? `/h/${ep.serieId}/ep/${ep.id}/fase/${doc.phase}` : '/maturando')
+  return (
+    <div className="fixed inset-0 z-[200] grid place-items-center bg-editor-desk p-6">
+      <div className="w-full max-w-[640px] rounded-[30px] bg-ph-maturacao p-8 text-[#eafaf3] shadow-[0_24px_50px_-20px_rgba(35,18,9,.7)]">
+        <div className="flex items-center gap-2.5"><Lock size={18} /><span className="text-[12px] font-bold tracking-[.12em] uppercase">trancado</span></div>
+        <div className="mt-3 font-serif text-[34px] leading-[1.1]">{doc.title}</div>
+        <p className="mt-1 text-[13px] text-[#eafaf3]/75">Ninguém lê antes da hora — nem você. Destrava sozinho.</p>
+        <div className="my-6 flex gap-3">
+          {([[c.days, 'dias'], [c.hours, 'horas'], [c.min, 'min'], [c.sec, 'seg']] as const).map(([v, l]) => (
+            <div key={l} className="flex-1 rounded-[18px] bg-[rgba(2,28,24,.32)] py-3 text-center">
+              <div className="font-mono text-[28px] font-bold">{pad2(v)}</div>
+              <div className="mt-1 text-[10px] tracking-[.12em] text-[#eafaf3]/70 uppercase">{l}</div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={back} className="rounded-full bg-[#eafaf3] px-4 py-[9px] text-[13px] font-bold text-ph-maturacao hover:bg-white">← Voltar</button>
+          <button type="button" onClick={() => navigate('/maturando?doc=' + doc.id)} className="rounded-full px-3 py-[9px] text-[12.5px] font-semibold text-[#eafaf3]/85 hover:underline">ver na Maturação</button>
+          <button
+            type="button"
+            onClick={() => { if (confirm('Ler agora quebra a maturação: a ideia é voltar com a cabeça fria. Abrir mesmo assim (só leitura)?')) navigate(`/texto/${doc.id}?espiar=1`, { replace: true }) }}
+            className="ml-auto rounded-full border-[1.5px] border-[#eafaf3]/45 px-4 py-[9px] text-[12.5px] font-semibold hover:bg-[#eafaf3]/14"
+          >
+            Ver mesmo assim
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Writer({ doc, readOnly = false }: { doc: Doc; readOnly?: boolean }) {
   const navigate = useNavigate()
   const ep = useStore((s) => s.episodes.find((e) => e.id === doc.episodeId))
   const serie = useStore((s) => s.series.find((x) => x.id === ep?.serieId))
@@ -96,6 +140,7 @@ function Writer({ doc }: { doc: Doc }) {
   const editor = useEditor({
     extensions: editorExtensions,
     content: doc.content,
+    editable: !readOnly,
     editorProps: {
       attributes: { class: 'script-editor', spellcheck: 'true', 'aria-label': 'Página do roteiro' },
       // Clique num chip de ligação abre o popover.
@@ -172,7 +217,7 @@ function Writer({ doc }: { doc: Doc }) {
   }
 
   const removeLink = (pos: number) => {
-    if (!editor) return
+    if (!editor || readOnly) return
     const node = editor.state.doc.nodeAt(pos)
     if (node?.type.name === 'link') editor.chain().focus().deleteRange({ from: pos, to: pos + node.nodeSize }).run()
     setPop(null)
@@ -212,7 +257,7 @@ function Writer({ doc }: { doc: Doc }) {
   }, [editor, jumpTo])
 
   const cycleStage = (pos: number) => {
-    if (!editor) return
+    if (!editor || readOnly) return
     const node = editor.state.doc.nodeAt(pos)
     if (!node) return
     const s = node.attrs.stage ?? -1
@@ -236,6 +281,7 @@ function Writer({ doc }: { doc: Doc }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey
+      if (readOnly && mod && ['k', 'j'].includes(e.key.toLowerCase())) { e.preventDefault(); return }
       if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); openPicker() }
       else if (e.key === 'Escape' && pop) setPop(null)
       else if (mod && e.key === '\\') { e.preventDefault(); togglePanel() }
@@ -244,12 +290,17 @@ function Writer({ doc }: { doc: Doc }) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [togglePanel, nextGap, editor, openPicker, pop])
+  }, [togglePanel, nextGap, editor, openPicker, pop, readOnly])
 
   const leave = () => navigate(ep ? `/h/${ep.serieId}/ep/${ep.id}/fase/${doc.phase}` : '/textos')
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col bg-editor-desk">
+      {readOnly && (
+        <div role="status" className="flex shrink-0 items-center gap-2 bg-ph-maturacao px-[22px] py-2 text-[12.5px] font-semibold text-[#eafaf3]">
+          <Lock size={14} /> Espiando um texto em maturação — só leitura. Destrava em {shortLeft(countdown(doc.lockedUntil ?? 0))}.
+        </div>
+      )}
       <TopBar
         doc={doc}
         editor={editor}
@@ -258,6 +309,7 @@ function Writer({ doc }: { doc: Doc }) {
         onTogglePanel={togglePanel}
         onLeave={leave}
         onLink={openPicker}
+        readOnly={readOnly}
       />
 
       <div className="flex min-h-0 flex-1">
@@ -353,7 +405,7 @@ function Writer({ doc }: { doc: Doc }) {
   )
 }
 
-function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink }: { doc: Doc; editor: Editor | null; sub: string; panel: boolean; onTogglePanel: () => void; onLeave: () => void; onLink: () => void }) {
+function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink, readOnly }: { doc: Doc; editor: Editor | null; sub: string; panel: boolean; onTogglePanel: () => void; onLeave: () => void; onLink: () => void; readOnly: boolean }) {
   const navigate = useNavigate()
   const updateDoc = useStore((s) => s.updateDoc)
   const phase = phaseOf(doc.phase)
@@ -396,7 +448,7 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink }: { d
         <span className="h-6 w-px bg-rail/16" />
         <span className="flex min-w-0 flex-1 items-center gap-2.5">
           <span className="max-w-[40%] min-w-[120px] font-serif text-[23px] text-ink">
-            <InlineEdit value={doc.title} onSave={(title) => updateDoc(doc.id, { title })} className="truncate" />
+            {readOnly ? <span className="block truncate">{doc.title}</span> : <InlineEdit value={doc.title} onSave={(title) => updateDoc(doc.id, { title })} className="truncate" />}
           </span>
           <span className="shrink-0 rounded-full px-2.5 py-[5px] text-[10.5px] font-bold tracking-[.08em] uppercase" style={{ background: phase.color, color: phase.ink }}>{phase.title}</span>
           <span className="truncate text-[12px] text-ink-muted">{sub}</span>
@@ -433,7 +485,7 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink }: { d
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 px-[22px] pb-[11px]">
+      {!readOnly && <div className="flex flex-wrap items-center gap-1.5 px-[22px] pb-[11px]">
         <button type="button" title="Negrito (Ctrl+B)" onMouseDown={run((e) => e.chain().focus().toggleBold().run())} className={`${markBtn} font-bold ${active?.bold ? on : ''}`}>B</button>
         <button type="button" title="Itálico (Ctrl+I)" onMouseDown={run((e) => e.chain().focus().toggleItalic().run())} className={`${markBtn} italic ${active?.italic ? on : ''}`}>I</button>
         <button type="button" title="Sublinhado (Ctrl+U)" onMouseDown={run((e) => e.chain().focus().toggleUnderline().run())} className={`${markBtn} underline ${active?.underline ? on : ''}`}>U</button>
@@ -455,7 +507,7 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink }: { d
             {b.label}
           </button>
         ))}
-      </div>
+      </div>}
     </div>
   )
 }

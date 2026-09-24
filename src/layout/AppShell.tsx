@@ -1,5 +1,8 @@
 import { Clock, Columns2, Download, FileText, Kanban, Upload, type LucideIcon } from 'lucide-react'
-import { NavLink, Outlet, useLocation } from 'react-router'
+import { useRef } from 'react'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
+import { downloadBackup, parseBackup, restoreBackup } from '../lib/backup'
+import { plural } from '../lib/format'
 import { useNow } from '../hooks/useNow'
 import { useStore } from '../store'
 
@@ -23,6 +26,32 @@ export function AppShell() {
   const { pathname } = useLocation()
   const now = useNow(30_000)
   const maturing = useStore((s) => s.docs.some((d) => (d.lockedUntil ?? 0) > now))
+  const navigate = useNavigate()
+  const fileInput = useRef<HTMLInputElement>(null)
+  const { showToast, reload } = useStore.getState()
+
+  const saveBackup = async () => {
+    try {
+      const b = await downloadBackup()
+      showToast(`Backup baixado: ${plural(b.series.length, 'história', 'histórias')}, ${plural(b.docs.length, 'texto', 'textos')}.`)
+    } catch (e) {
+      showToast('Não deu pra gerar o backup: ' + (e as Error).message)
+    }
+  }
+
+  const openBackup = async (file: File) => {
+    try {
+      const b = parseBackup(await file.text())
+      const when = b.exportedAt ? new Date(b.exportedAt).toLocaleString('pt-BR') : 'data desconhecida'
+      if (!confirm(`Abrir o backup de ${when} (${plural(b.series.length, 'história', 'histórias')}, ${plural(b.docs.length, 'texto', 'textos')})?\n\nTudo o que está no app agora será substituído. Se quiser guardar o estado atual, baixe um backup antes.`)) return
+      await restoreBackup(b)
+      await reload()
+      navigate('/')
+      showToast('Backup aberto.')
+    } catch (e) {
+      showToast((e as Error).message)
+    }
+  }
 
   return (
     <div className="flex min-h-screen gap-[14px] p-[14px]">
@@ -51,12 +80,19 @@ export function AppShell() {
           )
         })}
         <div className="mt-auto flex flex-col items-center gap-2">
-          <button type="button" title="Baixar backup" aria-label="Baixar backup" className={`${railBtn} text-rail-ink hover:bg-rail-active/16`}>
+          <button type="button" onClick={saveBackup} title="Baixar backup (.json)" aria-label="Baixar backup" className={`${railBtn} text-rail-ink hover:bg-rail-active/16`}>
             <Download size={18} />
           </button>
-          <button type="button" title="Abrir backup" aria-label="Abrir backup" className={`${railBtn} text-rail-ink hover:bg-rail-active/16`}>
+          <button type="button" onClick={() => fileInput.current?.click()} title="Abrir backup (.json)" aria-label="Abrir backup" className={`${railBtn} text-rail-ink hover:bg-rail-active/16`}>
             <Upload size={18} />
           </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) openBackup(f) }}
+          />
         </div>
       </aside>
 

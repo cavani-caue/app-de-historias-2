@@ -39,14 +39,6 @@ export function PrimaryButton({ children, onClick, small }: { children: ReactNod
   )
 }
 
-export function Placeholder({ title, etapa, back }: { title: string; etapa?: number; back?: { to: string; label: string } }) {
-  return (
-    <div>
-      <PageHeader title={title} sub={etapa ? `Esta tela chega na etapa ${etapa}.` : 'Nada por aqui.'} back={back} />
-      <div className="rounded-card border-2 border-dashed border-paper/70 p-10 text-center text-[13px] font-semibold text-paper/90">Em construção</div>
-    </div>
-  )
-}
 
 export function Pill({ children, bg, fg, onClick, title, className = '' }: { children: ReactNode; bg: string; fg: string; onClick?: () => void; title?: string; className?: string }) {
   const cls = `inline-flex shrink-0 items-center rounded-full px-[10px] py-[5px] text-[10.5px] font-bold tracking-[.08em] whitespace-nowrap uppercase ${className}`

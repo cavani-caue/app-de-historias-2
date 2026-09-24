@@ -30,8 +30,18 @@ export interface EnredoState {
   returnTo: { docId: string; scroll: number; label: string } | null
   setReturnTo: (r: EnredoState['returnTo']) => void
 
+  toast: { id: number; msg: string; action?: { label: string; to: string } } | null
+  showToast: (msg: string, action?: { label: string; to: string }) => void
+  hideToast: () => void
+
+  /** Manda maturar: vai para a fase Maturação e tranca até `until`. */
+  lockDoc: (id: string, until: number) => void
+  unlockDoc: (id: string) => void
+
   load: () => Promise<void>
   resetToSample: () => Promise<void>
+  /** Relê tudo do banco (depois de restaurar um backup). */
+  reload: () => Promise<void>
 
   addSerie: (patch?: Partial<Serie>) => Serie
   updateSerie: (id: string, patch: Patch<Serie>) => void
@@ -106,9 +116,21 @@ export const useStore = create<EnredoState>()((set, get) => {
     returnTo: null,
     setReturnTo: (returnTo) => set({ returnTo }),
 
+    toast: null,
+    showToast: (msg, action) => set({ toast: { id: Date.now(), msg, action } }),
+    hideToast: () => set({ toast: null }),
+
+    lockDoc: (id, until) => get().updateDoc(id, { phase: 'maturacao', lockedAt: Date.now(), lockedUntil: until, unlockNotified: false }),
+    unlockDoc: (id) => get().updateDoc(id, { lockedUntil: undefined, unlockNotified: true }, { touch: false }),
+
     load: async () => {
       if (!(await db.meta.get('seeded'))) await writeSeed()
       set({ ...(await readAll()), hydrated: true })
+    },
+
+    reload: async () => {
+      Object.values(get().imageUrls).forEach((u) => URL.revokeObjectURL(u))
+      set({ ...(await readAll()), hydrated: true, returnTo: null })
     },
 
     resetToSample: async () => {
