@@ -132,3 +132,22 @@
 .script-editor strong { font-weight: 700; }
 .script-editor u { text-decoration: underline; }
 .script-editor.is-locked { filter: blur(6px); user-select: none; pointer-events: none; }
+.script-editor .link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 9px;
+  margin: 0 2px;
+  border-radius: 999px;
+  background: var(--color-link-bg);
+  color: var(--color-link);
+  font: 600 12px/1.6 var(--font-sans);
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: 1px;
+}
+.script-editor .link-chip.ProseMirror-selectednode { outline: 2px solid var(--color-link); }

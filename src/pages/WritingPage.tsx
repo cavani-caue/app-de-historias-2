@@ -1,5 +1,5 @@
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react'
-import { ArrowLeft, Clock3, Download, Link2, PanelLeft, Redo2, Undo2 } from 'lucide-react'
+import { ArrowLeft, Clock3, Download, Link2, PanelLeft, Redo2, Undo2, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useShallow } from 'zustand/react/shallow'
@@ -7,10 +7,12 @@ import { InlineEdit } from '../components/ui'
 import { JOURNEY, phaseOf } from '../data/constants'
 import { editorExtensions } from '../editor/extensions'
 import { useClickOutside } from '../hooks/useClickOutside'
+import { LinkPicker } from '../components/LinkPicker'
 import { exportDoc } from '../lib/export'
+import { LINK_KIND, linkDestination, linkPreview, type LinkOption } from '../lib/links'
 import { epNum, pad2, plural } from '../lib/format'
 import { useDoc, useStore } from '../store'
-import type { BlockType, Doc } from '../types'
+import type { BlockType, Doc, LinkTarget } from '../types'
 
 const BLOCK_BTNS: { t: BlockType; prefix?: string; label: string; hint: string; hot?: boolean }[] = [
   { t: 'scene', prefix: 'INT. ', label: 'INT.', hint: 'Cabeçalho de cena interna — Ctrl+1' },
@@ -88,11 +90,23 @@ function Writer({ doc }: { doc: Doc }) {
   const [stats, setStats] = useState<Stats>({ words: 0, pages: 1, scenes: [], gaps: [] })
   const scroller = useRef<HTMLDivElement>(null)
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [picker, setPicker] = useState<{ from: number; to: number } | null>(null)
+  const [pop, setPop] = useState<{ pos: number; target: LinkTarget; label: string; x: number; y: number } | null>(null)
 
   const editor = useEditor({
     extensions: editorExtensions,
     content: doc.content,
-    editorProps: { attributes: { class: 'script-editor', spellcheck: 'true', 'aria-label': 'Página do roteiro' } },
+    editorProps: {
+      attributes: { class: 'script-editor', spellcheck: 'true', 'aria-label': 'Página do roteiro' },
+      // Clique num chip de ligação abre o popover.
+      handleClickOn: (view, _pos, node, nodePos) => {
+        if (node.type.name !== 'link') return false
+        const r = (view.nodeDOM(nodePos) as HTMLElement | null)?.getBoundingClientRect()
+        if (!r) return false
+        setPop({ pos: nodePos, target: node.attrs.target, label: node.attrs.label, x: Math.min(r.left, window.innerWidth - 320), y: r.bottom + 8 })
+        return true
+      },
+    },
     onUpdate: ({ editor }) => {
       setSaved('digitando…')
       setStats(readStats(editor))
@@ -106,6 +120,63 @@ function Writer({ doc }: { doc: Doc }) {
   })
 
   useEffect(() => { if (editor) setStats(readStats(editor)) }, [editor])
+
+  const flush = useCallback(() => {
+    if (pending.current && editor && !editor.isDestroyed) {
+      clearTimeout(pending.current)
+      pending.current = null
+      useStore.getState().updateDoc(doc.id, { content: editor.getJSON() })
+      setSaved('salvo agora')
+    }
+  }, [editor, doc.id])
+
+  // Voltando de uma ligação: restaura a rolagem e some com o botão.
+  const [restore] = useState(() => {
+    const r = useStore.getState().returnTo
+    return r && r.docId === doc.id ? r.scroll : null
+  })
+  useEffect(() => {
+    if (!editor || restore == null) return
+    const t = setTimeout(() => {
+      if (scroller.current) scroller.current.scrollTop = restore
+      if (useStore.getState().returnTo?.docId === doc.id) useStore.getState().setReturnTo(null)
+    }, 30)
+    return () => clearTimeout(t)
+  }, [editor, doc.id, restore])
+
+  const openPicker = useCallback(() => {
+    if (!editor || !serie) return
+    const { from, to } = editor.state.selection
+    setPop(null)
+    setPicker({ from, to })
+  }, [editor, serie])
+
+  const insertLink = (o: LinkOption) => {
+    if (!editor || !picker) return
+    editor.chain().focus().setTextSelection({ from: picker.from, to: picker.to }).insertLinkChip(o.target, o.chip).run()
+    setPicker(null)
+  }
+
+  const followLink = (t: LinkTarget) => {
+    const s = useStore.getState()
+    const dest = linkDestination(s, t)
+    if (!dest) return
+    flush()
+    if (dest.board && !s.plan(dest.board.key).boards.includes(dest.board.id)) {
+      const b = dest.board
+      s.updatePlan(b.key, (p) => ({ boards: [...p.boards, b.id] }))
+    }
+    s.setReturnTo({ docId: doc.id, scroll: scroller.current?.scrollTop ?? 0, label: doc.title })
+    setPop(null)
+    navigate(dest.url)
+  }
+
+  const removeLink = (pos: number) => {
+    if (!editor) return
+    const node = editor.state.doc.nodeAt(pos)
+    if (node?.type.name === 'link') editor.chain().focus().deleteRange({ from: pos, to: pos + node.nodeSize }).run()
+    setPop(null)
+  }
 
   // Salva o que estiver pendente ao sair.
   useEffect(() => () => {
@@ -165,13 +236,15 @@ function Writer({ doc }: { doc: Doc }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey
-      if (mod && e.key === '\\') { e.preventDefault(); togglePanel() }
+      if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); openPicker() }
+      else if (e.key === 'Escape' && pop) setPop(null)
+      else if (mod && e.key === '\\') { e.preventDefault(); togglePanel() }
       else if ((mod && e.shiftKey && e.key.toLowerCase() === 'j') || (e.altKey && e.code === 'KeyJ')) { e.preventDefault(); nextGap() }
       else if (mod && e.key.toLowerCase() === 'j' && !editor?.isFocused) { e.preventDefault(); editor?.chain().focus('end').insertGap().run() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [togglePanel, nextGap, editor])
+  }, [togglePanel, nextGap, editor, openPicker, pop])
 
   const leave = () => navigate(ep ? `/h/${ep.serieId}/ep/${ep.id}/fase/${doc.phase}` : '/textos')
 
@@ -184,6 +257,7 @@ function Writer({ doc }: { doc: Doc }) {
         panel={panel}
         onTogglePanel={togglePanel}
         onLeave={leave}
+        onLink={openPicker}
       />
 
       <div className="flex min-h-0 flex-1">
@@ -263,6 +337,9 @@ function Writer({ doc }: { doc: Doc }) {
         </div>
       </div>
 
+      {picker && serie && <LinkPicker serie={serie} ep={ep} onPick={insertLink} onClose={() => { setPicker(null); editor?.commands.focus() }} />}
+      {pop && <LinkPop pop={pop} onFollow={() => followLink(pop.target)} onRemove={() => removeLink(pop.pos)} onClose={() => setPop(null)} />}
+
       <footer className="flex shrink-0 items-center gap-[18px] border-t border-line bg-paper-2 px-[22px] py-2 font-mono text-[11px] text-ink/58">
         <span>{plural(stats.words, 'palavra', 'palavras')}</span>
         <span>~{plural(stats.pages, 'página', 'páginas')}</span>
@@ -276,7 +353,7 @@ function Writer({ doc }: { doc: Doc }) {
   )
 }
 
-function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave }: { doc: Doc; editor: Editor | null; sub: string; panel: boolean; onTogglePanel: () => void; onLeave: () => void }) {
+function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink }: { doc: Doc; editor: Editor | null; sub: string; panel: boolean; onTogglePanel: () => void; onLeave: () => void; onLink: () => void }) {
   const navigate = useNavigate()
   const updateDoc = useStore((s) => s.updateDoc)
   const phase = phaseOf(doc.phase)
@@ -363,7 +440,7 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave }: { doc: Doc;
         <button type="button" title="Lista" onMouseDown={run((e) => e.chain().focus().toggleBulletList().run())} className={`${markBtn} ${active?.list ? on : ''}`}>•</button>
         <button type="button" title="Desfazer (Ctrl+Z)" disabled={!active?.canUndo} onMouseDown={run((e) => e.chain().focus().undo().run())} className={markBtn}><Undo2 size={16} /></button>
         <button type="button" title="Refazer (Ctrl+Shift+Z)" disabled={!active?.canRedo} onMouseDown={run((e) => e.chain().focus().redo().run())} className={markBtn}><Redo2 size={16} /></button>
-        <button type="button" title="Ligar a um post-it, etapa, episódio… (Ctrl+K) — chega na etapa 7" disabled className="inline-flex h-8 items-center gap-1.5 rounded-[10px] bg-link-bg px-[11px] text-[12.5px] font-bold text-link opacity-60">
+        <button type="button" title="Ligar a um post-it, etapa, episódio… (Ctrl+K)" onMouseDown={(e) => { e.preventDefault(); onLink() }} className="inline-flex h-8 items-center gap-1.5 rounded-[10px] bg-link-bg px-[11px] text-[12.5px] font-bold text-link hover:bg-[#d4e0ff]">
           <Link2 size={14} strokeWidth={2.2} /> Ligação
         </button>
         <span className="mx-2 h-[22px] w-px bg-rail/16" />
@@ -378,6 +455,27 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave }: { doc: Doc;
             {b.label}
           </button>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function LinkPop({ pop, onFollow, onRemove, onClose }: { pop: { target: LinkTarget; label: string; x: number; y: number }; onFollow: () => void; onRemove: () => void; onClose: () => void }) {
+  const preview = useStore((s) => linkPreview(s, pop.target))
+  const reachable = useStore((s) => !!linkDestination(s, pop.target))
+  const box = useRef<HTMLDivElement>(null)
+  useClickOutside(box, onClose)
+  return (
+    <div ref={box} role="dialog" aria-label="Ligação" className="fixed z-[600] w-[300px] rounded-[18px] bg-paper-2 px-4 py-[14px] shadow-[0_26px_50px_-18px_rgba(30,15,8,.7)]" style={{ left: pop.x, top: Math.min(pop.y, window.innerHeight - 220) }}>
+      <div className="flex items-center gap-2">
+        <span className="text-[10.5px] font-bold tracking-[.1em] text-link uppercase">{LINK_KIND[pop.target.kind]}</span>
+        <button type="button" aria-label="Fechar" onClick={onClose} className="ml-auto text-ink/45 hover:text-ink"><X size={14} /></button>
+      </div>
+      <div className="mt-1 font-serif text-[20px] text-ink">{pop.label}</div>
+      <p className="mt-2 mb-3 line-clamp-5 text-[12.5px] leading-[1.4] text-ink/70">{preview}</p>
+      <div className="flex gap-2">
+        <button type="button" onClick={onFollow} disabled={!reachable} className="rounded-full bg-link px-[14px] py-2 text-[12.5px] font-bold text-white hover:brightness-110 disabled:opacity-40">Ir até lá →</button>
+        <button type="button" onClick={onRemove} className="px-1.5 py-2 text-[12px] font-semibold text-accent hover:underline">remover ligação</button>
       </div>
     </div>
   )

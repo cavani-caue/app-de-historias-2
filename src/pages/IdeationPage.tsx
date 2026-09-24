@@ -1,6 +1,6 @@
 import { Star, X } from 'lucide-react'
-import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useShallow } from 'zustand/react/shallow'
 import { BackLink } from '../components/ui'
 import { KINDS, NOTE_COLORS } from '../data/constants'
@@ -20,6 +20,17 @@ export default function IdeationPage() {
   const [draft, setDraft] = useState('')
   const [kind, setKind] = useState(KINDS[0])
   const [filter, setFilter] = useState('Todas')
+  const [params] = useSearchParams()
+  const focusId = params.get('ideia')
+  const [flash, setFlash] = useState<string | null>(focusId)
+
+  // Vindo de uma ligação (?ideia=id): rola até a nota e destaca com o anel azul.
+  useEffect(() => {
+    if (!focusId) return
+    document.getElementById('idea-' + focusId)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    const t = setTimeout(() => setFlash(null), 2400)
+    return () => clearTimeout(t)
+  }, [focusId])
 
   if (!serie) return <NotFound />
 
@@ -83,7 +94,7 @@ export default function IdeationPage() {
             style={{
               background: i.color,
               rotate: `${i.rot}deg`,
-              boxShadow: i.pinned ? '0 18px 34px -16px rgba(35,18,9,.75), 0 0 0 3px #2a1b12' : '0 14px 30px -18px rgba(35,18,9,.7)',
+              boxShadow: flash === i.id ? '0 0 0 5px #2c5bd1, 0 18px 30px -12px rgba(35,18,9,.7)' : i.pinned ? '0 18px 34px -16px rgba(35,18,9,.75), 0 0 0 3px #2a1b12' : '0 14px 30px -18px rgba(35,18,9,.7)',
             }}
           >
             <div className="flex items-center gap-2">

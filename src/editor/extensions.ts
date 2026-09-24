@@ -1,6 +1,7 @@
 import Document from '@tiptap/extension-document'
 import { ListItem } from '@tiptap/extension-list'
 import StarterKit from '@tiptap/starter-kit'
+import { LinkChip } from './LinkChip'
 import { ScreenplayBlock } from './ScreenplayBlock'
 
 /** Documento de roteiro: só blocos tipados (e listas de blocos). */
@@ -11,6 +12,7 @@ export const editorExtensions = [
   ScriptDocument,
   ScreenplayBlock,
   ScriptListItem,
+  LinkChip,
   StarterKit.configure({
     document: false,
     paragraph: false,

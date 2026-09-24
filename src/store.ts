@@ -26,6 +26,10 @@ export interface EnredoState {
   imageUrls: Record<string, string>
   phaseArt: Record<string, string> // key -> imageId
 
+  /** "Voltar ao texto": de onde o autor saiu ao seguir uma ligação (não é persistido). */
+  returnTo: { docId: string; scroll: number; label: string } | null
+  setReturnTo: (r: EnredoState['returnTo']) => void
+
   load: () => Promise<void>
   resetToSample: () => Promise<void>
 
@@ -99,6 +103,8 @@ export const useStore = create<EnredoState>()((set, get) => {
   return {
     hydrated: false,
     series: [], arcs: [], episodes: [], docs: [], ideas: [], plans: {}, imageUrls: {}, phaseArt: {},
+    returnTo: null,
+    setReturnTo: (returnTo) => set({ returnTo }),
 
     load: async () => {
       if (!(await db.meta.get('seeded'))) await writeSeed()
