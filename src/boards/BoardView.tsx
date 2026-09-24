@@ -1,5 +1,12 @@
-import { BOARDS } from '../data/constants'
+import type { ComponentType } from 'react'
 import type { BoardId } from '../types'
+import AnatomiaBoard from './AnatomiaBoard'
+import AtosBoard from './AtosBoard'
+import EscaletaBoard from './EscaletaBoard'
+import FichasBoard from './FichasBoard'
+import JornadaBoard from './JornadaBoard'
+import ProppBoard from './ProppBoard'
+import TensionBoard from './TensionBoard'
 
 export interface BoardProps {
   planKey: string
@@ -7,14 +14,22 @@ export interface BoardProps {
   epId?: string
 }
 
-export function BoardView({ id }: BoardProps & { id: BoardId }) {
-  const b = BOARDS.find((x) => x.id === id)
-  const etapa = id === 'postits' ? 6 : 5
-  return (
-    <div className="py-10 text-center">
-      <div className="font-serif text-[26px] text-ink">{b?.label}</div>
-      <p className="mt-1 text-[13px] text-ink-soft">{b?.desc}</p>
-      <p className="mt-3 text-[12px] font-semibold text-ink-muted">Este quadro chega na etapa {etapa}.</p>
-    </div>
-  )
+function WallSoon() {
+  return <p className="m-0 py-10 text-center text-[13px] font-semibold text-ink-muted">A parede infinita chega na etapa 6.</p>
+}
+
+const BOARDS: Record<BoardId, ComponentType<BoardProps>> = {
+  anatomia: AnatomiaBoard,
+  jornada: JornadaBoard,
+  propp: ProppBoard,
+  timeline: TensionBoard,
+  atos: AtosBoard,
+  escaleta: EscaletaBoard,
+  fichas: FichasBoard,
+  postits: WallSoon,
+}
+
+export function BoardView({ id, ...props }: BoardProps & { id: BoardId }) {
+  const Board = BOARDS[id]
+  return <Board {...props} />
 }

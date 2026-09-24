@@ -1,7 +1,7 @@
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react'
 import { ArrowLeft, Clock3, Download, Link2, PanelLeft, Redo2, Undo2 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useShallow } from 'zustand/react/shallow'
 import { InlineEdit } from '../components/ui'
 import { JOURNEY, phaseOf } from '../data/constants'
@@ -93,7 +93,6 @@ function Writer({ doc }: { doc: Doc }) {
     extensions: editorExtensions,
     content: doc.content,
     editorProps: { attributes: { class: 'script-editor', spellcheck: 'true', 'aria-label': 'Página do roteiro' } },
-    onCreate: ({ editor }) => setStats(readStats(editor)),
     onUpdate: ({ editor }) => {
       setSaved('digitando…')
       setStats(readStats(editor))
@@ -105,6 +104,8 @@ function Writer({ doc }: { doc: Doc }) {
       }, 600)
     },
   })
+
+  useEffect(() => { if (editor) setStats(readStats(editor)) }, [editor])
 
   // Salva o que estiver pendente ao sair.
   useEffect(() => () => {
@@ -147,6 +148,19 @@ function Writer({ doc }: { doc: Doc }) {
     const next = s >= 11 ? null : s + 1
     editor.view.dispatch(editor.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, stage: next }))
   }
+
+  // Vindo de "abrir" num buraco (?buraco=N): rola até ele e pisca.
+  const [params, setParams] = useSearchParams()
+  const gapParam = params.get('buraco')
+  useEffect(() => {
+    if (!editor || gapParam == null) return
+    const g = readStats(editor).gaps[Number(gapParam)]
+    const t = setTimeout(() => {
+      if (g) jumpTo(g.pos, true)
+      setParams((p) => { p.delete('buraco'); return p }, { replace: true })
+    }, 60)
+    return () => clearTimeout(t)
+  }, [editor, gapParam, jumpTo, setParams])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

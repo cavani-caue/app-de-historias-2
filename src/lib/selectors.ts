@@ -1,7 +1,7 @@
 import { PHASES, phaseOf } from '../data/constants'
 import type { Doc, Episode, PhaseId } from '../types'
 import type { EnredoState } from '../store'
-import { docBlocks } from './doc'
+import { docBlocks, docGaps } from './doc'
 import { ago, epNum, plural } from './format'
 
 /** Fase "atual" da história: a do primeiro episódio que não foi descartado. */
@@ -45,4 +45,23 @@ export function linkOptions(s: EnredoState) {
 export function phaseArtUrl(s: EnredoState, phase: PhaseId, serieId?: string) {
   const id = (serieId && s.phaseArt[`${serieId}:${phase}`]) || s.phaseArt[phase]
   return id ? s.imageUrls[id] : undefined
+}
+
+export interface ScopeGap {
+  text: string
+  stage: number
+  index: number // posição do buraco dentro do texto
+  doc: Doc
+  ep: Episode
+}
+
+/** Buracos de todos os textos da história (ou só de um episódio). */
+export function scopeGaps(docs: Doc[], episodes: Episode[], serieId: string, epId?: string): ScopeGap[] {
+  const out: ScopeGap[] = []
+  for (const d of docs) {
+    const ep = episodes.find((e) => e.id === d.episodeId)
+    if (!ep || ep.serieId !== serieId || (epId && ep.id !== epId)) continue
+    docGaps(d.content).forEach((g) => out.push({ ...g, doc: d, ep }))
+  }
+  return out
 }
