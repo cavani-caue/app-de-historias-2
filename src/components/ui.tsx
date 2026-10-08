@@ -6,9 +6,9 @@ export function PageHeader({ title, sub, action, back }: { title: ReactNode; sub
   return (
     <>
       {back && <BackLink to={back.to} label={back.label} />}
-      <header className="mb-[26px] flex items-end justify-between gap-6">
+      <header className="mb-[26px] flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
-          <h1 className="m-0 font-serif text-[56px] leading-none font-normal text-ink">{title}</h1>
+          <h1 className="m-0 font-serif text-[40px] md:text-[56px] leading-none font-normal text-ink">{title}</h1>
           {sub && <p className="mt-2 mb-0 text-[14px] text-ink-soft">{sub}</p>}
         </div>
         {action}

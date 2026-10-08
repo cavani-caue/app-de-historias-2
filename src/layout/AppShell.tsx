@@ -54,12 +54,12 @@ export function AppShell() {
   }
 
   return (
-    <div className="flex min-h-screen gap-[14px] p-[14px]">
-      <aside className="sticky top-[14px] z-[60] flex h-[calc(100vh-28px)] w-[74px] shrink-0 flex-col items-center gap-2 rounded-rail bg-rail py-4 shadow-rail">
+    <div className="flex min-h-screen gap-[14px] p-[14px] max-md:p-0">
+      <aside className="sticky top-[14px] z-[60] flex h-[calc(100vh-28px)] w-[74px] shrink-0 flex-col items-center gap-2 rounded-rail bg-rail py-4 shadow-rail max-md:fixed max-md:inset-x-2 max-md:top-auto max-md:bottom-[calc(8px+env(safe-area-inset-bottom))] max-md:h-16 max-md:w-auto max-md:flex-row max-md:justify-around max-md:gap-0 max-md:rounded-[22px] max-md:px-1 max-md:py-0">
         <NavLink
           to="/"
           title="Enredo"
-          className="mb-[10px] flex size-[42px] items-center justify-center rounded-[14px] bg-rail-active font-serif text-[24px] text-accent! hover:text-accent!"
+          className="mb-[10px] flex size-[42px] items-center justify-center rounded-[14px] bg-rail-active font-serif text-[24px] text-accent! hover:text-accent! max-md:hidden"
         >
           E
         </NavLink>
@@ -79,7 +79,7 @@ export function AppShell() {
             </NavLink>
           )
         })}
-        <div className="mt-auto flex flex-col items-center gap-2">
+        <div className="mt-auto flex flex-col items-center gap-2 max-md:mt-0 max-md:contents">
           <button type="button" onClick={saveBackup} title="Baixar backup (.json)" aria-label="Baixar backup" className={`${railBtn} text-rail-ink hover:bg-rail-active/16`}>
             <Download size={18} />
           </button>
@@ -89,14 +89,14 @@ export function AppShell() {
           <input
             ref={fileInput}
             type="file"
-            accept="application/json,.json"
+            accept="application/json,.json,text/plain,application/octet-stream"
             hidden
             onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) openBackup(f) }}
           />
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 px-4 pt-[22px] pb-12">
+      <main className="min-w-0 flex-1 px-4 pt-[22px] pb-12 max-md:px-3 max-md:pt-[calc(16px+env(safe-area-inset-top))] max-md:pb-[calc(96px+env(safe-area-inset-bottom))]">
         <Outlet />
       </main>
     </div>

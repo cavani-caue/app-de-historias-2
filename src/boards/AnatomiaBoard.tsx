@@ -5,7 +5,7 @@ import type { BoardProps } from './BoardView'
 export default function AnatomiaBoard({ planKey }: BoardProps) {
   const [plan, setPlan] = usePlan(planKey)
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-[14px]">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-[14px]">
       {ANATOMY.map((a) => (
         <label key={a.key} className="block rounded-[18px] bg-paper-2 px-4 py-[14px]">
           <span className="block text-[11px] font-bold tracking-[.1em] text-accent uppercase">{a.label}</span>

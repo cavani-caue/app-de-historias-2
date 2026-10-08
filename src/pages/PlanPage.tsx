@@ -47,13 +47,13 @@ export default function PlanPage() {
     <div className="max-w-[1080px]">
       <BackLink to={isEp ? `/h/${serieId}/ep/${epId}` : `/h/${serieId}`} label={isEp && ep ? `ep. ${epNum(ep.num)} — ${ep.title}` : serie.title} />
       <header className="mb-[22px]">
-        <h1 className="m-0 font-serif text-[52px] leading-none font-normal text-ink">{isEp ? 'Planejamento do episódio' : 'Planejamento da história'}</h1>
+        <h1 className="m-0 font-serif text-[38px] md:text-[52px] leading-none font-normal text-ink">{isEp ? 'Planejamento do episódio' : 'Planejamento da história'}</h1>
         <p className="mt-2 mb-0 text-[14px] text-ink-soft">
           {isEp && ep ? `ep. ${epNum(ep.num)} — ${ep.title} · o desenho do episódio antes do texto.` : 'O desenho da série antes dos textos: do que ela trata, em quantos episódios e o que já é canônico.'}
         </p>
       </header>
 
-      <div className="mb-[26px] grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4">
+      <div className="mb-[26px] grid grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] gap-4">
         <div className={card}>
           <Label className="mb-2">Premissa</Label>
           <textarea value={plan.premissa} onChange={(e) => setPlan({ premissa: e.target.value })} rows={3} placeholder="Do que é a história, numa frase com conflito." className={`${area} font-serif text-[21px] leading-[1.3] text-ink`} />
@@ -90,7 +90,7 @@ export default function PlanPage() {
       </div>
 
       {addOpen && missing.length > 0 && (
-        <div className="mb-[18px] grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-2.5">
+        <div className="mb-[18px] grid grid-cols-[repeat(auto-fill,minmax(min(250px,100%),1fr))] gap-2.5">
           {missing.map((b) => (
             <button
               key={b.id}

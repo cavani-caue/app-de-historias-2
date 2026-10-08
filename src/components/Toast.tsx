@@ -14,7 +14,7 @@ export function Toast() {
   }, [toast, hide])
   if (!toast) return null
   return (
-    <div role="status" aria-live="polite" className="fixed bottom-[22px] left-1/2 z-[800] flex max-w-[min(560px,92vw)] -translate-x-1/2 items-center gap-3 rounded-full bg-ink py-2.5 pr-2.5 pl-5 text-[13px] text-paper shadow-pop">
+    <div role="status" aria-live="polite" className="fixed bottom-[22px] left-1/2 z-[800] max-md:bottom-[calc(84px+env(safe-area-inset-bottom))] flex max-w-[min(560px,92vw)] -translate-x-1/2 items-center gap-3 rounded-full bg-ink py-2.5 pr-2.5 pl-5 text-[13px] text-paper shadow-pop">
       <span className="min-w-0">{toast.msg}</span>
       {toast.action && (
         <button type="button" onClick={() => { navigate(toast.action!.to); hide() }} className="shrink-0 rounded-full bg-paper px-3 py-1.5 text-[12px] font-bold text-ink hover:bg-white">

@@ -53,7 +53,7 @@ export default function IdeationPage() {
     <div className="max-w-[1000px]">
       <BackLink to={'/h/' + serieId} label={serie.title} />
       <header className="mb-5">
-        <h1 className="m-0 font-serif text-[52px] leading-none font-normal text-ink">Ideação da história</h1>
+        <h1 className="m-0 font-serif text-[38px] md:text-[52px] leading-none font-normal text-ink">Ideação da história</h1>
         <p className="mt-2 mb-0 text-[14px] text-ink-soft">Vale para a história inteira, não para um episódio só. Destaque o que quiser puxar depois.</p>
       </header>
 
@@ -85,7 +85,7 @@ export default function IdeationPage() {
         <span className="ml-1.5 text-[12.5px] text-ink/60">{plural(shown.length, 'ideia', 'ideias')}</span>
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(258px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(258px,100%),1fr))] gap-4">
         {shown.map((i) => (
           <div
             key={i.id}

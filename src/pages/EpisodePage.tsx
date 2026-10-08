@@ -29,14 +29,14 @@ export default function EpisodePage() {
     <div>
       <BackLink to={'/h/' + serieId} label={serie.title} />
       <header className="mb-[26px]">
-        <h1 className="m-0 flex items-baseline gap-3 font-serif text-[52px] leading-none font-normal text-ink">
+        <h1 className="m-0 flex items-baseline gap-3 font-serif text-[38px] md:text-[52px] leading-none font-normal text-ink">
           <span className="shrink-0">ep. {epNum(ep.num)} —</span>
           <InlineEdit value={ep.title} onSave={(title) => updateEpisode(epId, { title })} />
         </h1>
         <p className="mt-2 mb-0 text-[14px] text-ink-soft">As fases deste episódio. Cada fase guarda quantos textos você quiser — dá pra ter três vomit drafts e escolher um depois.</p>
       </header>
 
-      <div className="mb-[34px] grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
+      <div className="mb-[34px] grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-4">
         <div className="rounded-[24px] bg-paper p-5 shadow-card">
           <div className="mb-2.5 flex items-center gap-2.5">
             <span className="label-caps">Pergunta dramática do episódio</span>
@@ -70,7 +70,7 @@ export default function EpisodePage() {
       </div>
 
       <h2 className="mt-0 mb-[14px] font-serif text-[30px] font-normal text-ink">Fases do episódio</h2>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-x-6 gap-y-10">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(236px,100%),1fr))] gap-x-6 gap-y-10 max-sm:grid-cols-2 max-sm:gap-x-4 max-sm:gap-y-7">
         {PHASES.map((p) => <PhaseCard key={p.id} phase={p} ep={ep} />)}
       </div>
 
@@ -133,19 +133,19 @@ function PhaseCard({ phase: p, ep }: { phase: PhaseDef; ep: Episode }) {
         className={`absolute inset-0 overflow-hidden rounded-phase ${over ? 'ring-4 ring-gold' : ''}`}
         style={{ background: p.color, boxShadow: `0 22px 46px -16px rgba(35,18,9,.65), 0 0 0 7px ${p.halo}` }}
       >
-        <div className="absolute right-3 -bottom-[18px] font-display text-[124px] leading-none" style={{ color: p.ghost }}>{p.num}</div>
+        <div className="absolute right-3 -bottom-[18px] font-display text-[124px] leading-none max-sm:text-[84px]" style={{ color: p.ghost }}>{p.num}</div>
         <div className="absolute top-[34%] left-1/2 -ml-[59px] size-[118px] rounded-full border-[10px]" style={{ borderColor: p.ghost }} />
         <div className="absolute top-[52%] left-1/2 -ml-8 h-2.5 w-16 rounded-md" style={{ background: p.ghost }} />
       </div>
-      <div className="pointer-events-none absolute inset-0 z-[2] flex flex-col justify-between px-[18px] pt-4 pb-5">
+      <div className="pointer-events-none absolute inset-0 z-[2] flex flex-col justify-between px-[18px] pt-4 pb-5 max-sm:px-3 max-sm:pt-3 max-sm:pb-3.5">
         <div className="flex flex-col items-start gap-2">
           <span className="rounded-full px-[11px] py-[5px] text-[10.5px] font-bold tracking-[.1em] uppercase" style={{ background: p.chipBg, color: p.ink }}>{status}</span>
           {lock && <span className="rounded-[12px] px-3 py-1.5 font-mono text-[19px] font-bold" style={{ background: p.chipBg, color: p.ink }}>{shortLeft(lock)}</span>}
         </div>
         <div>
-          <div className="font-display text-[20px] leading-[1.05] uppercase" style={{ color: p.ink }}>{p.title}</div>
+          <div className="font-display text-[20px] leading-[1.05] uppercase max-sm:text-[14px]" style={{ color: p.ink }}>{p.title}</div>
           <div className="mt-[9px] mb-2.5 h-0.5 w-[34px]" style={{ background: p.rule }} />
-          <p className="m-0 text-[12.5px] leading-[1.4]" style={{ color: p.inkSoft }}>{p.desc}</p>
+          <p className="m-0 text-[12.5px] leading-[1.4] max-sm:line-clamp-3 max-sm:text-[10.5px]" style={{ color: p.inkSoft }}>{p.desc}</p>
         </div>
       </div>
       <div className="absolute inset-x-[8%] top-[14%] bottom-[26%] z-[3] transition-[translate,scale] duration-[340ms] ease-leak group-hover:-translate-y-[16%] group-hover:scale-142">

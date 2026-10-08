@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { JOURNEY } from '../data/constants'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { usePlan } from '../hooks/usePlan'
 import { epNum, pad2 } from '../lib/format'
 import { scopeGaps } from '../lib/selectors'
@@ -15,6 +16,9 @@ export default function JornadaBoard({ planKey, serieId, epId }: BoardProps) {
   const [params] = useSearchParams()
   const [sel, setSel] = useState(() => Math.min(11, Math.max(0, Number(params.get('sel') ?? 0) || 0)))
   const [plan, setPlan] = usePlan(planKey)
+  // No celular não cabem os rótulos em volta do círculo: só os números, maiores e mais para fora.
+  const narrow = useMediaQuery('(max-width: 639px)')
+  const R = narrow ? 35 : 30
   const docs = useStore((s) => s.docs)
   const episodes = useStore((s) => s.episodes)
   const gaps = useMemo(() => scopeGaps(docs, episodes, serieId, epId), [docs, episodes, serieId, epId])
@@ -39,7 +43,7 @@ export default function JornadaBoard({ planKey, serieId, epId }: BoardProps) {
           const filled = has(i)
           const n = gapsAt(i).length
           const cos = Math.cos(a)
-          const size = on ? 58 : 46
+          const size = narrow ? (on ? 44 : 36) : on ? 58 : 46
           return (
             <div key={i}>
               <button
@@ -49,8 +53,8 @@ export default function JornadaBoard({ planKey, serieId, epId }: BoardProps) {
                 onClick={() => setSel(i)}
                 className="absolute z-[2] flex -translate-1/2 items-center justify-center rounded-full border-[2.5px] font-display text-[16px] transition-[width,height] duration-150"
                 style={{
-                  left: `${50 + cos * 30}%`,
-                  top: `${50 + Math.sin(a) * 30}%`,
+                  left: `${50 + cos * R}%`,
+                  top: `${50 + Math.sin(a) * R}%`,
                   width: size,
                   height: size,
                   background: on ? '#a8432f' : filled ? (dark ? '#f4e9d8' : '#2a1b12') : dark ? '#1e1b18' : '#f7ecdc',
@@ -66,6 +70,7 @@ export default function JornadaBoard({ planKey, serieId, epId }: BoardProps) {
                 )}
                 {!filled && n === 0 && <span className="pointer-events-none absolute -inset-[7px] rounded-full border-2 border-dashed border-accent" />}
               </button>
+              {!narrow && (
               <button
                 type="button"
                 tabIndex={-1}
@@ -80,6 +85,7 @@ export default function JornadaBoard({ planKey, serieId, epId }: BoardProps) {
               >
                 {label}
               </button>
+              )}
             </div>
           )
         })}

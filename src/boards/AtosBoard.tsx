@@ -33,8 +33,8 @@ export default function AtosBoard({ planKey, serieId, epId }: BoardProps) {
 
   return (
     <div className="flex flex-wrap items-start gap-[18px]">
-      <div className="min-w-0 flex-[3_1_560px] rounded-[18px] bg-paper-2 px-3 pt-[14px] pb-1.5">
-        <div className="relative aspect-[1000/430] w-full">
+      <div className="min-w-0 flex-[3_1_560px] overflow-x-auto rounded-[18px] bg-paper-2 px-3 pt-[14px] pb-1.5">
+        <div className="relative aspect-[1000/430] w-full max-sm:w-[680px]">
           <svg viewBox="0 0 1000 430" className="absolute inset-0 block size-full font-serif" role="img" aria-label="Linha do tempo em 3 atos">
             <line x1="20" y1="360" x2="990" y2="360" stroke="#2a1b12" strokeWidth="2" />
             <line x1="300" y1="60" x2="300" y2="428" stroke="#2a1b12" strokeWidth="1.5" />
@@ -70,7 +70,7 @@ export default function AtosBoard({ planKey, serieId, epId }: BoardProps) {
                 type="button"
                 onClick={() => setSel(i)}
                 aria-pressed={on}
-                className="absolute w-max max-w-[110px] font-serif text-[clamp(10px,1.35vw,15px)] leading-[1.05]"
+                className="absolute w-max max-w-[110px] font-serif text-[clamp(10px,1.35vw,15px)] max-sm:text-[11px] leading-[1.05]"
                 style={{
                   left: `${b.x / 10 - (i === 3 || i === 10 ? 0.6 : 0)}%`,
                   top: `${(tickTop - 4) / 4.3}%`,

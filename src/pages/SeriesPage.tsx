@@ -21,7 +21,7 @@ export default function SeriesPage() {
         sub="Cada história guarda sua ideação e seus episódios. Passe o mouse — quem mora ali sai do quadro."
         action={<PrimaryButton onClick={create}>Nova história</PrimaryButton>}
       />
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-x-[26px] gap-y-[34px]">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-x-[26px] gap-y-[34px]">
         {series.map((s) => <SerieCard key={s.id} serie={s} />)}
         <DashedTile label="Nova história" onClick={create} className="aspect-square rounded-card" />
       </div>

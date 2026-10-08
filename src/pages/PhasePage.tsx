@@ -37,7 +37,7 @@ export default function PhasePage() {
           <span className="inline-block rounded-full px-3 py-1.5 text-[10.5px] font-bold tracking-[.1em] uppercase" style={{ background: phase.color, color: phase.ink }}>
             {serie.title} · ep. {epNum(ep.num)} — {ep.title}
           </span>
-          <h1 className="mt-2.5 mb-0 font-serif text-[52px] leading-none font-normal text-ink">{phase.title}</h1>
+          <h1 className="mt-2.5 mb-0 font-serif text-[38px] md:text-[52px] leading-none font-normal text-ink">{phase.title}</h1>
           <p className="mt-2 mb-0 text-[14px] text-ink-soft">{phase.desc}</p>
           <button
             type="button"
@@ -61,7 +61,7 @@ export default function PhasePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-4">
         {docs.map((d) => <DocCard key={d.id} doc={d} />)}
         <DashedTile label={`Novo ${phase.noun}`} onClick={newDoc} className="min-h-[150px]" />
       </div>

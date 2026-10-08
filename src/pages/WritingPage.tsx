@@ -13,6 +13,7 @@ import { LINK_KIND, linkDestination, linkPreview, type LinkOption } from '../lib
 import { countdown, epNum, pad2, plural, shortLeft } from '../lib/format'
 import { isLocked } from '../lib/selectors'
 import { useNow } from '../hooks/useNow'
+import { isAndroidApp } from '../lib/platform'
 import { useDoc, useStore } from '../store'
 import type { BlockType, Doc, LinkTarget } from '../types'
 
@@ -63,7 +64,8 @@ function readStats(editor: Editor): Stats {
   return { words, pages, scenes, gaps }
 }
 
-const readPanelPref = () => { try { return localStorage.getItem('enredo-panel') !== '0' } catch { return true } }
+const isNarrow = () => typeof window !== 'undefined' && window.innerWidth < 768
+const readPanelPref = () => { if (isNarrow()) return false; try { return localStorage.getItem('enredo-panel') !== '0' } catch { return true } }
 
 export default function WritingPage() {
   const { docId = '' } = useParams()
@@ -314,11 +316,11 @@ function Writer({ doc, readOnly = false }: { doc: Doc; readOnly?: boolean }) {
 
       <div className="flex min-h-0 flex-1">
         {panel && (
-          <aside className="w-[266px] shrink-0 overflow-x-hidden overflow-y-auto border-r border-line bg-paper px-4 py-5">
+          <aside className="w-[266px] shrink-0 overflow-x-hidden overflow-y-auto border-r border-line bg-paper px-4 py-5 max-md:absolute max-md:inset-y-0 max-md:left-0 max-md:z-30 max-md:w-[min(300px,86vw)] max-md:shadow-pop">
             <div className="mb-2.5 label-caps">Cenas</div>
             <div className="flex flex-col gap-[3px]">
               {stats.scenes.map((s, i) => (
-                <button key={s.pos} type="button" onClick={() => jumpTo(s.pos)} className="flex min-w-0 items-center gap-[9px] rounded-[12px] px-2.5 py-2 text-left font-mono text-[11.5px] text-ink/80 hover:bg-rail/9">
+                <button key={s.pos} type="button" onClick={() => { jumpTo(s.pos); if (isNarrow()) setPanel(false) }} className="flex min-w-0 items-center gap-[9px] rounded-[12px] px-2.5 py-2 text-left font-mono text-[11.5px] text-ink/80 hover:bg-rail/9">
                   <span className="text-ink/42">{pad2(i + 1)}</span>
                   <span className="truncate">{s.title}</span>
                 </button>
@@ -334,7 +336,7 @@ function Writer({ doc, readOnly = false }: { doc: Doc; readOnly?: boolean }) {
             <div className="flex flex-col gap-1.5">
               {stats.gaps.map((g) => (
                 <div key={g.pos} className="rounded-[12px] border-[1.5px] border-dashed border-gap-line bg-gap-bg px-2.5 py-2">
-                  <button type="button" onClick={() => jumpTo(g.pos, true)} className="block text-left text-[12px] leading-[1.3] text-gap-ink italic">{g.text}</button>
+                  <button type="button" onClick={() => { jumpTo(g.pos, true); if (isNarrow()) setPanel(false) }} className="block text-left text-[12px] leading-[1.3] text-gap-ink italic">{g.text}</button>
                   <button
                     type="button"
                     onClick={() => cycleStage(g.pos)}
@@ -371,7 +373,7 @@ function Writer({ doc, readOnly = false }: { doc: Doc; readOnly?: boolean }) {
           </aside>
         )}
 
-        <div ref={scroller} className="relative min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-[clamp(12px,2vw,24px)] pt-[34px] pb-[120px]">
+        <div ref={scroller} className="relative min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-[clamp(12px,2vw,24px)] pt-[34px] pb-[120px] max-md:px-2 max-md:pt-3">
           {!panel && (
             <button
               type="button"
@@ -392,9 +394,9 @@ function Writer({ doc, readOnly = false }: { doc: Doc; readOnly?: boolean }) {
       {picker && serie && <LinkPicker serie={serie} ep={ep} onPick={insertLink} onClose={() => { setPicker(null); editor?.commands.focus() }} />}
       {pop && <LinkPop pop={pop} onFollow={() => followLink(pop.target)} onRemove={() => removeLink(pop.pos)} onClose={() => setPop(null)} />}
 
-      <footer className="flex shrink-0 items-center gap-[18px] border-t border-line bg-paper-2 px-[22px] py-2 font-mono text-[11px] text-ink/58">
+      <footer className="flex shrink-0 items-center gap-[18px] border-t border-line bg-paper-2 px-[22px] py-2 font-mono text-[11px] whitespace-nowrap text-ink/58 max-md:gap-3 max-md:px-3 max-md:pb-[calc(8px+env(safe-area-inset-bottom))]">
         <span>{plural(stats.words, 'palavra', 'palavras')}</span>
-        <span>~{plural(stats.pages, 'página', 'páginas')}</span>
+        <span className="max-md:hidden">~{plural(stats.pages, 'página', 'páginas')}</span>
         <span>{plural(stats.scenes.length, 'cena', 'cenas')}</span>
         <button type="button" onClick={nextGap} className="rounded-full border border-dashed border-gap-line bg-gap-bg px-[9px] py-px text-[#8a5a00]">
           {plural(stats.gaps.length, 'buraco', 'buracos')}
@@ -441,17 +443,17 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink, readO
 
   return (
     <div className="shrink-0 border-b border-line bg-paper-2">
-      <div className="flex items-center gap-[14px] px-[22px] py-3">
+      <div className="flex items-center gap-[14px] px-[22px] py-3 max-md:gap-2 max-md:px-3 max-md:pt-[calc(8px+env(safe-area-inset-top))]">
         <button type="button" onClick={onLeave} className="inline-flex shrink-0 items-center gap-[7px] text-[12.5px] font-semibold text-ink/70 hover:text-ink">
-          <ArrowLeft size={15} strokeWidth={2.4} /> Sair da escrita
+          <ArrowLeft size={15} strokeWidth={2.4} /> <span className="max-md:sr-only">Sair da escrita</span>
         </button>
-        <span className="h-6 w-px bg-rail/16" />
+        <span className="h-6 w-px bg-rail/16 max-md:hidden" />
         <span className="flex min-w-0 flex-1 items-center gap-2.5">
-          <span className="max-w-[40%] min-w-[120px] font-serif text-[23px] text-ink">
+          <span className="max-w-[40%] min-w-[120px] font-serif text-[23px] text-ink max-md:max-w-none max-md:min-w-0 max-md:flex-1 max-md:text-[19px]">
             {readOnly ? <span className="block truncate">{doc.title}</span> : <InlineEdit value={doc.title} onSave={(title) => updateDoc(doc.id, { title })} className="truncate" />}
           </span>
-          <span className="shrink-0 rounded-full px-2.5 py-[5px] text-[10.5px] font-bold tracking-[.08em] uppercase" style={{ background: phase.color, color: phase.ink }}>{phase.title}</span>
-          <span className="truncate text-[12px] text-ink-muted">{sub}</span>
+          <span className="shrink-0 rounded-full px-2.5 py-[5px] text-[10.5px] font-bold tracking-[.08em] uppercase max-md:hidden" style={{ background: phase.color, color: phase.ink }}>{phase.title}</span>
+          <span className="truncate text-[12px] text-ink-muted max-lg:hidden">{sub}</span>
         </span>
         <button
           type="button"
@@ -459,14 +461,14 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink, readO
           title="Esconder/mostrar painel (Ctrl+\)"
           className={`flex h-[34px] shrink-0 items-center gap-[7px] rounded-[11px] px-3 text-[12.5px] font-semibold whitespace-nowrap text-ink/70 hover:bg-rail/10 ${panel ? '' : 'bg-rail/8'}`}
         >
-          <PanelLeft size={17} /> {panel ? 'Esconder painel' : 'Mostrar painel'}
+          <PanelLeft size={17} /> <span className="max-md:sr-only">{panel ? 'Esconder painel' : 'Mostrar painel'}</span>
         </button>
         <div ref={saveBox} className="relative flex shrink-0 gap-2">
-          <button type="button" onClick={() => setSaveOpen((o) => !o)} aria-expanded={saveOpen} className="inline-flex items-center gap-2 rounded-full bg-rail/8 px-4 py-[9px] text-[13px] font-semibold whitespace-nowrap text-rail hover:bg-rail/16">
-            <Download size={15} /> Salvar no PC
+          <button type="button" onClick={() => setSaveOpen((o) => !o)} aria-expanded={saveOpen} className="inline-flex items-center gap-2 rounded-full bg-rail/8 px-4 py-[9px] max-md:px-3 text-[13px] font-semibold whitespace-nowrap text-rail hover:bg-rail/16">
+            <Download size={15} /> <span className="max-md:sr-only">{isAndroidApp ? 'Salvar / enviar' : 'Salvar no PC'}</span>
           </button>
-          <button type="button" onClick={() => navigate('/maturando?doc=' + doc.id)} className="inline-flex items-center gap-2 rounded-full bg-ph-maturacao px-4 py-[9px] text-[13px] font-semibold whitespace-nowrap text-[#eafaf3] hover:bg-[#0b564d]">
-            <Clock3 size={15} /> Mandar maturar
+          <button type="button" onClick={() => navigate('/maturando?doc=' + doc.id)} className="inline-flex items-center gap-2 rounded-full bg-ph-maturacao px-4 py-[9px] max-md:px-3 text-[13px] font-semibold whitespace-nowrap text-[#eafaf3] hover:bg-[#0b564d]">
+            <Clock3 size={15} /> <span className="max-md:sr-only">Mandar maturar</span>
           </button>
           {saveOpen && (
             <div className="absolute top-[calc(100%+10px)] right-0 z-[60] w-64 rounded-[18px] bg-paper-2 p-2 shadow-[0_26px_50px_-18px_rgba(35,18,9,.55)]">
@@ -485,7 +487,7 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink, readO
         </div>
       </div>
 
-      {!readOnly && <div className="flex flex-wrap items-center gap-1.5 px-[22px] pb-[11px]">
+      {!readOnly && <div className="flex flex-wrap items-center gap-1.5 px-[22px] pb-[11px] max-md:flex-nowrap max-md:overflow-x-auto max-md:px-3 max-md:[scrollbar-width:none] max-md:[&>*]:shrink-0">
         <button type="button" title="Negrito (Ctrl+B)" onMouseDown={run((e) => e.chain().focus().toggleBold().run())} className={`${markBtn} font-bold ${active?.bold ? on : ''}`}>B</button>
         <button type="button" title="Itálico (Ctrl+I)" onMouseDown={run((e) => e.chain().focus().toggleItalic().run())} className={`${markBtn} italic ${active?.italic ? on : ''}`}>I</button>
         <button type="button" title="Sublinhado (Ctrl+U)" onMouseDown={run((e) => e.chain().focus().toggleUnderline().run())} className={`${markBtn} underline ${active?.underline ? on : ''}`}>U</button>

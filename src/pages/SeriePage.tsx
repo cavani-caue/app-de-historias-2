@@ -32,7 +32,7 @@ export default function SeriePage() {
     <div>
       <BackLink to="/" label="Histórias" />
       <header className="mb-6">
-        <h1 className="m-0 font-serif text-[56px] leading-none font-normal text-ink">
+        <h1 className="m-0 font-serif text-[40px] md:text-[56px] leading-none font-normal text-ink">
           <InlineEdit value={serie.title} onSave={(title) => updateSerie(serieId, { title })} />
         </h1>
         <p className="mt-2 mb-0 text-[14px] text-ink-soft">
@@ -43,7 +43,7 @@ export default function SeriePage() {
         </p>
       </header>
 
-      <div className="mb-[34px] grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4">
+      <div className="mb-[34px] grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-4">
         <EntryCard
           title="Ideação da história"
           desc="Tudo que ainda não tem episódio: e se, reviravoltas, mundo, personagens."
@@ -78,7 +78,7 @@ export default function SeriePage() {
         <h2 className={sectionTitle}>Episódios</h2>
         <PrimaryButton small onClick={newEpisode}>Novo episódio</PrimaryButton>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-4">
         {episodes.map((e) => <EpisodeCard key={e.id} ep={e} />)}
         <DashedTile label="Novo episódio" onClick={newEpisode} className="min-h-[120px]" />
       </div>

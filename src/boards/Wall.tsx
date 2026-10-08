@@ -15,6 +15,7 @@ type Drag =
   | { kind: 'rgroup'; id: string }
   | { kind: 'pen'; pts: Pt[]; color: string }
   | { kind: 'frame'; x0: number; y0: number; x1: number; y1: number }
+  | { kind: 'pinch'; d0: number; s0: number; wx: number; wy: number }
 
 const MIN_S = 0.35
 const MAX_S = 2.4
@@ -108,8 +109,28 @@ export default function Wall({ planKey, full, onToggleFull, focusNote }: WallPro
 
   const capture = (e: RPointerEvent) => view.current?.setPointerCapture?.(e.pointerId)
 
+  // Dedos na parede (para a pinça de zoom no celular).
+  const touches = useRef(new Map<number, Pt>())
+  const pinchInfo = () => {
+    const [a, b] = [...touches.current.values()]
+    const r = view.current!.getBoundingClientRect()
+    return { dist: Math.hypot(a[0] - b[0], a[1] - b[1]), mx: (a[0] + b[0]) / 2 - r.left, my: (a[1] + b[1]) / 2 - r.top }
+  }
+
   const onDown = (e: RPointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
+    if (e.pointerType === 'touch') {
+      touches.current.set(e.pointerId, [e.clientX, e.clientY])
+      if (touches.current.size === 2) {
+        // Segundo dedo: vira pinça (descarta o traço ou a moldura que o primeiro começou).
+        const { dist, mx, my } = pinchInfo()
+        const c = wRef.current
+        drag.current = { kind: 'pinch', d0: dist, s0: c.scale, wx: (mx - c.vx) / c.scale, wy: (my - c.vy) / c.scale }
+        setLive(null)
+        capture(e)
+        return
+      }
+    }
     const p = world(e)
     if (mode === 'caneta') drag.current = { kind: 'pen', pts: [p], color: pen }
     else if (mode === 'postit') {
@@ -125,8 +146,16 @@ export default function Wall({ planKey, full, onToggleFull, focusNote }: WallPro
   }
 
   const onMove = (e: RPointerEvent<HTMLDivElement>) => {
+    if (touches.current.has(e.pointerId)) touches.current.set(e.pointerId, [e.clientX, e.clientY])
     const d = drag.current
     if (!d) return
+    if (d.kind === 'pinch') {
+      if (touches.current.size < 2) return
+      const { dist, mx, my } = pinchInfo()
+      const sc = Math.min(MAX_S, Math.max(MIN_S, d.s0 * (dist / d.d0)))
+      commit((c) => ({ ...c, scale: sc, vx: mx - d.wx * sc, vy: my - d.wy * sc }))
+      return
+    }
     if (d.kind === 'pan') { commit((c) => ({ ...c, vx: d.vx + (e.clientX - d.x), vy: d.vy + (e.clientY - d.y) })); return }
     const p = world(e)
     if (d.kind === 'pen') { d.pts.push(p); setLive({ ...d }) }
@@ -143,8 +172,14 @@ export default function Wall({ planKey, full, onToggleFull, focusNote }: WallPro
     } else if (d.kind === 'rgroup') commit((c) => ({ ...c, groups: c.groups.map((g) => (g.id === d.id ? { ...g, w: Math.max(160, p[0] - g.x), h: Math.max(120, p[1] - g.y) } : g)) }))
   }
 
-  const onUp = () => {
+  const onUp = (e: RPointerEvent<HTMLDivElement>) => {
+    touches.current.delete(e.pointerId)
     const d = drag.current
+    if (d?.kind === 'pinch') {
+      // Ao tirar um dedo, termina a pinça; o outro não continua arrastando.
+      if (touches.current.size < 2) { drag.current = null; setLive(null) }
+      return
+    }
     if (d?.kind === 'pen' && d.pts.length > 1) commit((c) => ({ ...c, strokes: [...c.strokes, { d: path(d.pts), color: d.color }] }))
     if (d?.kind === 'frame') {
       const gw = Math.abs(d.x1 - d.x0), gh = Math.abs(d.y1 - d.y0)
@@ -186,7 +221,7 @@ export default function Wall({ planKey, full, onToggleFull, focusNote }: WallPro
   const stroke = live?.kind === 'pen' ? live : null
 
   const toolbar = (
-    <div className="mb-2.5 flex flex-wrap items-center gap-2">
+    <div className="mb-2.5 flex flex-wrap items-center gap-2 max-md:flex-nowrap max-md:overflow-x-auto max-md:pb-1 max-md:[scrollbar-width:none] max-md:[&>*]:shrink-0">
       <div className="flex gap-[3px] rounded-full bg-paper-2 p-1" role="toolbar" aria-label="Ferramentas da parede">
         {TOOLS.map(([id, label]) => (
           <button key={id} type="button" aria-pressed={mode === id} onClick={() => setMode(id)} className="rounded-full px-[14px] py-[7px] text-[12px] font-semibold" style={mode === id ? { background: '#2a1b12', color: '#f7ecdc' } : { color: '#3a2318' }}>
@@ -220,7 +255,7 @@ export default function Wall({ planKey, full, onToggleFull, focusNote }: WallPro
   )
 
   return (
-    <div className={full ? 'fixed inset-0 z-[300] flex h-screen flex-col bg-desk p-[14px]' : 'flex flex-col'}>
+    <div className={full ? 'fixed inset-0 z-[300] flex h-dvh flex-col bg-desk p-[14px] max-md:px-2 max-md:pt-[calc(10px+env(safe-area-inset-top))] max-md:pb-[calc(10px+env(safe-area-inset-bottom))]' : 'flex flex-col'}>
       {toolbar}
       <div
         ref={view}
@@ -288,7 +323,7 @@ export default function Wall({ planKey, full, onToggleFull, focusNote }: WallPro
             {stroke && <path d={path(stroke.pts)} stroke={stroke.color} strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />}
           </svg>
         </div>
-        <div className="pointer-events-none absolute bottom-3 left-[14px] font-mono text-[10.5px] text-ink/50">
+        <div className="pointer-events-none absolute bottom-3 left-[14px] font-mono text-[10.5px] text-ink/50 max-md:hidden">
           fundo = navegar · roda = zoom · duplo clique = post-it · faixa do post-it = mover · canto = redimensionar · Caneta desenha por cima de tudo · Grupo: arraste pra criar uma moldura
         </div>
       </div>

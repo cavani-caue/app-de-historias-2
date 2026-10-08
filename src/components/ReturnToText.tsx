@@ -12,7 +12,7 @@ export function ReturnToText() {
     <button
       type="button"
       onClick={() => navigate('/texto/' + r.docId)}
-      className="fixed right-[22px] bottom-[22px] z-[700] flex max-w-[min(420px,80vw)] items-center gap-2.5 rounded-full bg-link py-3 pr-5 pl-4 text-white shadow-[0_18px_36px_-14px_rgba(20,30,80,.7)] hover:brightness-110"
+      className="fixed right-[22px] bottom-[22px] z-[700] max-md:right-3 max-md:bottom-[calc(84px+env(safe-area-inset-bottom))] flex max-w-[min(420px,80vw)] items-center gap-2.5 rounded-full bg-link py-3 pr-5 pl-4 text-white shadow-[0_18px_36px_-14px_rgba(20,30,80,.7)] hover:brightness-110"
     >
       <ArrowLeft size={16} strokeWidth={2.4} />
       <span className="text-[13px] font-bold whitespace-nowrap">Voltar ao texto</span>
