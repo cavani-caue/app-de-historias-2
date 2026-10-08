@@ -1,3 +1,4 @@
+import { saveFile } from './platform'
 import type { PMNode } from '../types'
 import { docBlocks, type SimpleBlock } from './doc'
 
@@ -91,23 +92,13 @@ export function toHtml(title: string, bodyHtml: string): string {
 `
 }
 
-export function download(name: string, body: string, mime: string) {
-  const a = document.createElement('a')
-  const url = URL.createObjectURL(new Blob([body], { type: mime }))
-  a.href = url
-  a.download = name
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 2000)
-}
 
 export const safeName = (title: string) => title.replace(/[—–]/g, '-').replace(/[^\wÀ-ÿ .-]/g, '').replace(/\s+/g, ' ').trim() || 'texto'
 
-export function exportDoc(kind: 'txt' | 'fountain' | 'html', title: string, content: PMNode, html: string) {
+export async function exportDoc(kind: 'txt' | 'fountain' | 'html', title: string, content: PMNode, html: string) {
   const name = safeName(title)
   const blocks = docBlocks(content)
-  if (kind === 'txt') return download(name + '.txt', toTxt(blocks), 'text/plain;charset=utf-8')
-  if (kind === 'fountain') return download(name + '.fountain', toFountain(title, blocks), 'text/plain;charset=utf-8')
-  return download(name + '.html', toHtml(title, html), 'text/html;charset=utf-8')
+  if (kind === 'txt') return saveFile(name + '.txt', toTxt(blocks), 'text/plain;charset=utf-8')
+  if (kind === 'fountain') return saveFile(name + '.fountain', toFountain(title, blocks), 'text/plain;charset=utf-8')
+  return saveFile(name + '.html', toHtml(title, html), 'text/html;charset=utf-8')
 }

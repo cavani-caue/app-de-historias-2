@@ -1,4 +1,5 @@
 import { db } from '../db'
+import { saveFile } from './platform'
 import type { Arc, Doc, Episode, Idea, PhaseArt, Plan, Serie } from '../types'
 
 export interface Backup {
@@ -36,14 +37,7 @@ export async function buildBackup(): Promise<Backup> {
 export async function downloadBackup() {
   const data = await buildBackup()
   const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')
-  const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }))
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `enredo-backup-${stamp}.json`
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 2000)
+  await saveFile(`enredo-backup-${stamp}.json`, JSON.stringify(data), 'application/json')
   return data
 }
 

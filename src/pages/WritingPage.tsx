@@ -427,8 +427,8 @@ function TopBar({ doc, editor, sub, panel, onTogglePanel, onLeave, onLink, readO
 
   const save = (kind: 'txt' | 'fountain' | 'html') => {
     if (!editor) return
-    exportDoc(kind, doc.title, editor.getJSON(), editor.getHTML())
     setSaveOpen(false)
+    exportDoc(kind, doc.title, editor.getJSON(), editor.getHTML()).catch((e) => useStore.getState().showToast('Não deu pra salvar: ' + (e as Error).message))
   }
 
   const run = (fn: (e: Editor) => void) => (ev: React.MouseEvent) => {

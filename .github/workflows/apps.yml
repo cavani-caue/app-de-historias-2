@@ -1,0 +1,121 @@
+# Gera o app de celular (Android .apk) e o instalador do PC (Windows .exe)
+# e publica os dois numa Release do GitHub.
+name: Apps (Android e Windows)
+
+on:
+  push:
+    branches: [main, claude/optimistic-shannon-nkp20s]
+    paths-ignore: ['docs/**', '**/*.md', 'design_handoff_enredo_redesign/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apps-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (.apk)
+    runs-on: ubuntu-latest
+    outputs:
+      signed: ${{ steps.sign.outputs.signed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - name: Build do app e cópia para o projeto Android
+        run: npm run android:sync
+      - name: Chave de assinatura (segredos do repositório)
+        id: sign
+        env:
+          KEYSTORE_B64: ${{ secrets.ENREDO_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ENREDO_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ] && [ -n "$KEYSTORE_PASSWORD" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/enredo.keystore"
+            echo "ENREDO_KEYSTORE=$RUNNER_TEMP/enredo.keystore" >> "$GITHUB_ENV"
+            echo "ENREDO_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Segredos ENREDO_KEYSTORE_BASE64/ENREDO_KEYSTORE_PASSWORD ausentes: o .apk sai com a chave de debug e não entra na Release."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Compilar o .apk
+        working-directory: android
+        env:
+          ENREDO_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/Enredo.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Enredo-android
+          path: Enredo.apk
+          if-no-files-found: error
+
+  windows:
+    name: Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build do app e instalador
+        run: npm run desktop:win -- --publish never
+      - name: Renomear o instalador
+        shell: bash
+        run: cp release/Enredo-Setup-*.exe Enredo-Setup.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Enredo-windows
+          path: Enredo-Setup.exe
+          if-no-files-found: error
+
+  release:
+    name: Publicar Release
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Montar a lista de arquivos
+        id: files
+        run: |
+          if [ "${{ needs.android.outputs.signed }}" = "true" ]; then
+            printf 'list<<EOF\nEnredo.apk\nEnredo-Setup.exe\nEOF\n' >> "$GITHUB_OUTPUT"
+            echo "apk_note=" >> "$GITHUB_OUTPUT"
+          else
+            printf 'list<<EOF\nEnredo-Setup.exe\nEOF\n' >> "$GITHUB_OUTPUT"
+            echo "apk_note=O .apk do Android entra aqui assim que os segredos de assinatura forem configurados." >> "$GITHUB_OUTPUT"
+          fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apps-${{ github.run_number }}
+          name: Enredo — versão ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: ${{ steps.files.outputs.list }}
+          body: |
+            **Celular (Android):** baixe `Enredo.apk` no celular e abra. Na primeira vez o Android pede para permitir instalar apps desta fonte.
+            **PC (Windows):** baixe `Enredo-Setup.exe` e abra. Se aparecer "O Windows protegeu o computador", clique em *Mais informações → Executar assim mesmo* (o instalador não tem certificado pago).
+
+            As histórias ficam guardadas só no aparelho. Para passar do PC para o celular (ou o contrário), use *Baixar backup* e *Abrir backup* na barra do app.
+
+            ${{ steps.files.outputs.apk_note }}
