@@ -24,6 +24,19 @@ npx vite preview   # serve o build: dá pra instalar como app e usar offline
 
 Em desenvolvimento, o store fica em `window.enredo` no console.
 
+## Apps de celular e PC
+
+O mesmo código vira um **app Android** (Capacitor, pasta `android/`) e um **app de Windows** (Electron, pasta `electron/`).
+Os dois são gerados pelo GitHub Actions (`.github/workflows/apps.yml`) a cada push e publicados numa
+[Release](../../releases/latest) com `Enredo.apk` e `Enredo-Setup.exe`.
+
+- **Assinatura do Android:** o `.apk` só entra na Release se os segredos `ENREDO_KEYSTORE_BASE64` e
+  `ENREDO_KEYSTORE_PASSWORD` estiverem configurados em *Settings → Secrets and variables → Actions*.
+  Com a mesma chave, cada versão nova instala por cima da anterior sem apagar as histórias.
+- **Rodar localmente:** `npm run desktop` (abre o app de PC) e `npm run android:sync` (copia o build para
+  o projeto Android, que abre no Android Studio).
+- No app, "Salvar" e "Baixar backup" usam o menu de compartilhar no Android e o "Salvar como" no PC.
+
 ## Stack
 
 Vite + React + TypeScript · React Router · Tailwind v4 · Zustand + Dexie (IndexedDB) · lucide-react · TipTap · vite-plugin-pwa.
