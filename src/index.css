@@ -1,0 +1,153 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Cores base */
+  --color-desk: #a8734f;
+  --color-rail: #3a2318;
+  --color-rail-ink: #e8d5bd;
+  --color-rail-active: #f2e3cf;
+  --color-paper: #f7ecdc;
+  --color-paper-2: #fffdf7;
+  --color-ink: #2a1b12;
+  --color-ink-soft: rgba(42, 27, 18, 0.68);
+  --color-ink-muted: rgba(42, 27, 18, 0.55);
+  --color-accent: #a8432f;
+  --color-gold: #f5c518;
+  --color-link: #2c5bd1;
+  --color-link-bg: #e6edff;
+  --color-gap-bg: #fff3b8;
+  --color-gap-line: #c98f00;
+  --color-gap-ink: #5a3e00;
+  --color-editor-desk: #e7dcc9;
+  --color-wall: #efe6d6;
+  --color-line: rgba(58, 35, 24, 0.14);
+  --color-line-strong: rgba(58, 35, 24, 0.24);
+
+  /* Fases */
+  --color-ph-brainstorm: #7b3fe4;
+  --color-ph-plan: #e8a12a;
+  --color-ph-vomit: #25a244;
+  --color-ph-maturacao: #0f6e63;
+  --color-ph-segunda: #2c5bd1;
+  --color-ph-refino: #e8622a;
+  --color-ph-pronto: #1e1b18;
+
+  /* Tipografia */
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-display: 'Archivo Black', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-script: 'Courier Prime', ui-monospace, monospace;
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Raios */
+  --radius-rail: 26px;
+  --radius-card: 26px;
+  --radius-phase: 30px;
+  --radius-cover: 18px;
+
+  /* Sombras */
+  --shadow-card: 0 18px 38px -22px rgba(35, 18, 9, 0.6);
+  --shadow-phase: 0 22px 46px -16px rgba(35, 18, 9, 0.65);
+  --shadow-btn: 0 10px 22px -10px rgba(30, 15, 8, 0.8);
+  --shadow-pop: 0 26px 50px -18px rgba(35, 18, 9, 0.65);
+  --shadow-postit: 0 12px 22px -12px rgba(35, 18, 9, 0.7);
+  --shadow-rail: 0 20px 40px -18px rgba(30, 15, 8, 0.7);
+
+  --ease-leak: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    background-color: var(--color-desk);
+    background-image: radial-gradient(rgba(58, 35, 24, 0.1) 1px, transparent 1px);
+    background-size: 26px 26px;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--color-rail);
+    text-decoration: none;
+  }
+  a:hover {
+    color: #000;
+  }
+  button {
+    cursor: pointer;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(58, 35, 24, 0.35);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@utility label-caps {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-ink-muted);
+}
+
+/* Página do roteiro (editor TipTap) ----------------------------------- */
+.script-editor {
+  outline: none;
+  min-height: 74vh;
+  padding: clamp(40px, 7vw, 88px) clamp(22px, 7vw, 104px) 140px;
+  font-family: var(--font-script);
+  font-size: 15.5px;
+  line-height: 1.62;
+  color: var(--color-ink);
+  caret-color: var(--color-accent);
+}
+.script-editor .sb { white-space: pre-wrap; margin: 0 0 12px; min-height: 1.6em; }
+.script-editor .sb-scene { margin: 26px 0 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.02em; }
+.script-editor .sb-scene:first-child { margin-top: 0; }
+.script-editor .sb-action { margin: 0 0 12px; }
+.script-editor .sb-character { margin: 14px 0 0; padding-left: 38%; text-transform: uppercase; }
+.script-editor .sb-paren { margin: 0; padding-left: 31%; padding-right: 30%; font-style: italic; color: rgba(42, 27, 18, 0.72); }
+.script-editor .sb-dialog { margin: 0 0 12px; padding-left: 22%; padding-right: 24%; }
+.script-editor .sb-transition { margin: 14px 0 18px; text-align: right; text-transform: uppercase; font-weight: 700; }
+.script-editor .sb-note { margin: 0 0 12px; font-style: italic; color: rgba(42, 27, 18, 0.45); }
+.script-editor .sb-gap {
+  margin: 12px 0 16px;
+  padding: 10px 14px;
+  border: 1.5px dashed var(--color-gap-line);
+  border-radius: 8px;
+  background: var(--color-gap-bg);
+  color: var(--color-gap-ink);
+  font-style: italic;
+}
+.script-editor ul { margin: 0 0 12px; padding-left: 1.4em; list-style: disc; }
+.script-editor li > .sb { margin: 0 0 4px; }
+.script-editor strong { font-weight: 700; }
+.script-editor u { text-decoration: underline; }
+.script-editor.is-locked { filter: blur(6px); user-select: none; pointer-events: none; }
+.script-editor .link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 9px;
+  margin: 0 2px;
+  border-radius: 999px;
+  background: var(--color-link-bg);
+  color: var(--color-link);
+  font: 600 12px/1.6 var(--font-sans);
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: 1px;
+}
+.script-editor .link-chip.ProseMirror-selectednode { outline: 2px solid var(--color-link); }

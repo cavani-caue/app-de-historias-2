@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Enredo</string>
+    <string name="title_activity_main">Enredo</string>
+    <string name="package_name">com.enredo.app</string>
+    <string name="custom_url_scheme">com.enredo.app</string>
+</resources>

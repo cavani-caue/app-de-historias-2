@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<script src="./image-slot.js"></script>
+<style>
+  body { margin:0; background:#a8734f; color:#2a1b12; font-family:system-ui,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:#3a2318; text-decoration:none; }
+  a:hover { color:#000; }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:rgba(58,35,24,.35); border-radius:999px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  [data-editor] { outline:none; }
+  [data-editor] div { min-height:1.6em; }
+</style>
+</helmet>
+<div style="min-height:100vh; display:flex; gap:14px; padding:14px; background:#a8734f; background-image:radial-gradient(rgba(58,35,24,.10) 1px, transparent 1px); background-size:26px 26px">
+
+  <aside style="width:74px; flex-shrink:0; position:sticky; top:14px; height:calc(100vh - 28px); background:#3a2318; border-radius:26px; display:flex; flex-direction:column; align-items:center; padding:16px 0; gap:8px; box-shadow:0 20px 40px -18px rgba(30,15,8,.7); z-index:60">
+    <div style="width:42px; height:42px; border-radius:14px; background:#f2e3cf; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-family:'Instrument Serif',Georgia,serif; font-size:24px; color:#a8432f">E</div>
+    <div onClick="{{ goSeries }}" title="Histórias" style="width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:{{ navSeries }}; color:{{ navSeriesInk }}" style-hover="background:rgba(242,227,207,.2)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="6" height="16" rx="1"></rect><rect x="14" y="4" width="6" height="16" rx="1"></rect></svg>
+    </div>
+    <div onClick="{{ goDocs }}" title="Todos os textos" style="width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:{{ navDocs }}; color:{{ navDocsInk }}" style-hover="background:rgba(242,227,207,.2)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M9 9h6"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg>
+    </div>
+    <div onClick="{{ goMaturing }}" title="Maturando" style="position:relative; width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:{{ navMaturing }}; color:{{ navMaturingInk }}" style-hover="background:rgba(242,227,207,.2)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>
+      <span style="position:absolute; top:7px; right:7px; width:7px; height:7px; border-radius:999px; background:#f5c518"></span>
+    </div>
+    <div onClick="{{ goBoard }}" title="Quadro geral" style="width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:{{ navBoard }}; color:{{ navBoardInk }}" style-hover="background:rgba(242,227,207,.2)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="5" height="14" rx="1"></rect><rect x="11" y="5" width="5" height="9" rx="1"></rect><rect x="18" y="5" width="2" height="12" rx="1"></rect></svg>
+    </div>
+    <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px; align-items:center">
+      <div title="Baixar backup" style="width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; color:#e8d5bd; cursor:pointer" style-hover="background:rgba(242,227,207,.16)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v11"></path><path d="M7 12l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+      </div>
+      <div title="Abrir backup" style="width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; color:#e8d5bd; cursor:pointer" style-hover="background:rgba(242,227,207,.16)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20V9"></path><path d="M7 12l5-5 5 5"></path><path d="M5 4h14"></path></svg>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1; min-width:0; padding:22px 16px 48px">
+
+    <sc-if value="{{ isSeries }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <header style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:26px">
+          <div>
+            <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:56px; line-height:1; font-weight:400; margin:0; color:#2a1b12">Histórias</h1>
+            <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">Cada história guarda sua ideação e seus episódios. Passe o mouse — quem mora ali sai do quadro.</p>
+          </div>
+          <div onClick="{{ newSerie }}" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; flex-shrink:0; background:#2a1b12; color:#f7ecdc; font-size:14px; font-weight:600; border-radius:999px; padding:13px 22px; cursor:pointer; box-shadow:0 10px 22px -10px rgba(30,15,8,.8)" style-hover="background:#000">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            Nova história
+          </div>
+        </header>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:26px; row-gap:34px">
+          <sc-for list="{{ seriesCards }}" as="s" hint-placeholder-count="4">
+            <div onClick="{{ s.open }}" style="position:relative; cursor:pointer; z-index:1" style-hover="z-index:30">
+              <div style="border-radius:26px; background:#f7ecdc; padding:12px 12px 16px; box-shadow:0 20px 40px -18px rgba(35,18,9,.6)">
+                <div style="position:relative; aspect-ratio:4/3; border-radius:18px; background:{{ s.color }}; background-image:radial-gradient(circle at 50% 58%, {{ s.glow }}, transparent 62%)">
+                  <div style="position:absolute; inset:6% 8%; transition:transform .34s cubic-bezier(.2,.8,.2,1)" style-hover="transform:translateY(-14%) scale(1.3)">
+                    <image-slot id="{{ s.slotId }}" shape="rect" fit="contain" placeholder="só o personagem (PNG)"></image-slot>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:14px; padding:0 6px">
+                  <div style="min-width:0">
+                    <div style="font-family:'Instrument Serif',Georgia,serif; font-size:28px; line-height:1.05; color:#2a1b12">{{ s.title }}</div>
+                    <div style="font-size:12px; color:rgba(42,27,18,.6); margin-top:4px">{{ s.meta }}</div>
+                  </div>
+                  <span style="flex-shrink:0; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; padding:6px 11px; border-radius:999px; background:{{ s.chipBg }}; color:{{ s.chipFg }}">{{ s.kind }}</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+          <div onClick="{{ newSerie }}" style="aspect-ratio:1/1; border-radius:26px; border:2px dashed rgba(247,236,220,.75); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; color:rgba(247,236,220,.92)" style-hover="background:rgba(247,236,220,.12)">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            <span style="font-size:12.5px; font-weight:600">Nova história</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSerie }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div onClick="{{ goSeries }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.7); cursor:pointer; margin-bottom:12px" style-hover="color:#2a1b12">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+          Histórias
+        </div>
+        <header style="margin-bottom:24px">
+          <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:56px; line-height:1; font-weight:400; margin:0; color:#2a1b12">{{ serieTitle }}</h1>
+          <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">{{ serieSub }}</p>
+        </header>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-bottom:34px">
+          <div onClick="{{ goIdeation }}" style="position:relative; overflow:hidden; border-radius:24px; background:#7b3fe4; padding:22px; cursor:pointer; box-shadow:0 20px 42px -20px rgba(35,18,9,.65)" style-hover="transform:translateY(-4px)">
+            <div style="position:absolute; right:-10px; bottom:-30px; font-family:'Archivo Black',sans-serif; font-size:110px; line-height:1; color:rgba(253,246,232,.13)">?</div>
+            <div style="font-family:'Archivo Black',sans-serif; font-size:17px; text-transform:uppercase; color:#fdf6e8">Ideação da história</div>
+            <div style="height:2px; width:30px; background:#f5c518; margin:9px 0 10px"></div>
+            <p style="font-size:12.5px; line-height:1.4; margin:0; color:rgba(253,246,232,.82)">Tudo que ainda não tem episódio: e se, reviravoltas, mundo, personagens.</p>
+            <div style="margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(253,246,232,.75)">{{ ideaCount }} ideias · {{ pinCount }} destacadas</div>
+          </div>
+          <div onClick="{{ goPlan }}" style="position:relative; overflow:hidden; border-radius:24px; background:#a8432f; padding:22px; cursor:pointer; box-shadow:0 20px 42px -20px rgba(35,18,9,.65)" style-hover="transform:translateY(-4px)">
+            <div style="position:absolute; right:-6px; bottom:-34px; font-family:'Archivo Black',sans-serif; font-size:110px; line-height:1; color:rgba(255,241,228,.14)">#</div>
+            <div style="font-family:'Archivo Black',sans-serif; font-size:17px; text-transform:uppercase; color:#fff1e4">Planejamento da história</div>
+            <div style="height:2px; width:30px; background:#f5c518; margin:9px 0 10px"></div>
+            <p style="font-size:12.5px; line-height:1.4; margin:0; color:rgba(255,241,228,.85)">O desenho da série: premissa, arcos e a grade de episódios — o que é canônico e o que ainda é palpite.</p>
+            <div style="margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(255,241,228,.8)">{{ planPrevistos }} episódios previstos</div>
+          </div>
+          <div style="position:relative; overflow:hidden; border-radius:24px; background:#f7ecdc; padding:22px; box-shadow:0 20px 42px -22px rgba(35,18,9,.6)">
+            <div style="font-family:'Archivo Black',sans-serif; font-size:17px; text-transform:uppercase; color:#2a1b12">Onde a história está</div>
+            <div style="height:2px; width:30px; background:#a8432f; margin:9px 0 10px"></div>
+            <div style="display:flex; flex-direction:column; gap:7px; margin-top:12px">
+              <sc-for list="{{ serieProgress }}" as="g" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:9px; font-size:12.5px; color:rgba(42,27,18,.78)">
+                  <span style="width:9px; height:9px; border-radius:999px; background:{{ g.color }}"></span>
+                  <span>{{ g.title }}</span>
+                  <span style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:rgba(42,27,18,.55)">{{ g.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:16px">
+          <h2 style="font-family:'Instrument Serif',Georgia,serif; font-size:34px; font-weight:400; margin:0; color:#2a1b12">Episódios</h2>
+          <div onClick="{{ newEpisode }}" style="display:inline-flex; align-items:center; gap:8px; background:#2a1b12; color:#f7ecdc; font-size:13px; font-weight:600; border-radius:999px; padding:11px 18px; cursor:pointer" style-hover="background:#000">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            Novo episódio
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px">
+          <sc-for list="{{ episodes }}" as="e" hint-placeholder-count="3">
+            <div onClick="{{ e.open }}" style="background:#f7ecdc; border-radius:24px; padding:18px; cursor:pointer; box-shadow:0 18px 38px -22px rgba(35,18,9,.6); display:flex; gap:16px" style-hover="background:#fffdf7">
+              <div style="flex-shrink:0; width:54px; height:54px; border-radius:16px; background:{{ e.color }}; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black',sans-serif; font-size:18px; color:{{ e.ink }}">{{ e.num }}</div>
+              <div style="min-width:0">
+                <div style="font-family:'Instrument Serif',Georgia,serif; font-size:24px; line-height:1.1; color:#2a1b12">{{ e.title }}</div>
+                <p style="font-size:12.5px; line-height:1.4; margin:6px 0 10px; color:rgba(42,27,18,.65)">{{ e.logline }}</p>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                  <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:5px 10px; border-radius:999px; background:{{ e.color }}; color:{{ e.ink }}">{{ e.phaseLabel }}</span>
+                  <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:5px 10px; border-radius:999px; background:{{ e.statusBg }}; color:{{ e.statusFg }}">{{ e.statusLabel }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.55)">{{ e.docLabel }}</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+          <div onClick="{{ newEpisode }}" style="min-height:120px; border-radius:24px; border:2px dashed rgba(247,236,220,.75); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:rgba(247,236,220,.92)" style-hover="background:rgba(247,236,220,.12)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            <span style="font-size:12.5px; font-weight:600">Novo episódio</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1080px">
+        <div onClick="{{ planBack }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.7); cursor:pointer; margin-bottom:12px" style-hover="color:#2a1b12">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+          {{ planBackLabel }}
+        </div>
+        <header style="margin-bottom:22px">
+          <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:52px; line-height:1; font-weight:400; margin:0; color:#2a1b12">{{ planTitle }}</h1>
+          <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">{{ planSub }}</p>
+        </header>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px; margin-bottom:26px">
+          <div style="background:#f7ecdc; border-radius:24px; padding:20px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:8px">Premissa</div>
+            <textarea value="{{ planPremissa }}" onChange="{{ onPremissa }}" rows="3" style="width:100%; border:0; outline:none; resize:vertical; background:transparent; font-family:'Instrument Serif',Georgia,serif; font-size:21px; line-height:1.3; color:#2a1b12"></textarea>
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin:16px 0 8px">Pergunta dramática</div>
+            <textarea value="{{ planPergunta }}" onChange="{{ onPergunta }}" rows="2" style="width:100%; border:0; outline:none; resize:vertical; background:transparent; font-family:'Instrument Serif',Georgia,serif; font-size:19px; line-height:1.3; font-style:italic; color:rgba(42,27,18,.8)"></textarea>
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin:16px 0 8px">Princípio narrativo</div>
+            <textarea value="{{ planPrincipio }}" onChange="{{ onPrincipio }}" rows="2" placeholder="A ideia de forma: o que a estrutura da série faz com o espectador." style="width:100%; border:0; outline:none; resize:vertical; background:transparent; font-family:system-ui,sans-serif; font-size:13.5px; line-height:1.45; color:rgba(42,27,18,.78)"></textarea>
+          </div>
+
+          <sc-if value="{{ isSerieScope }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#f7ecdc; border-radius:24px; padding:20px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:10px">Formato</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px">
+              <sc-for list="{{ planFormats }}" as="f" hint-placeholder-count="4">
+                <span onClick="{{ f.pick }}" style="font-size:12px; font-weight:600; padding:7px 13px; border-radius:999px; cursor:pointer; background:{{ f.bg }}; color:{{ f.fg }}; border:1.5px solid {{ f.bc }}">{{ f.label }}</span>
+              </sc-for>
+            </div>
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin:18px 0 10px">Episódios previstos</div>
+            <div style="display:flex; align-items:center; gap:14px">
+              <span onClick="{{ lessEp }}" style="width:34px; height:34px; border-radius:12px; background:rgba(58,35,24,.1); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:19px; color:#2a1b12">−</span>
+              <span style="font-family:'Archivo Black',sans-serif; font-size:34px; color:#2a1b12">{{ planPrevistos }}</span>
+              <span onClick="{{ moreEp }}" style="width:34px; height:34px; border-radius:12px; background:rgba(58,35,24,.1); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:19px; color:#2a1b12">+</span>
+              <span style="font-size:12px; color:rgba(42,27,18,.6); min-width:0">{{ planGapLabel }}</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:18px">
+              <sc-for list="{{ planCounts }}" as="c" hint-placeholder-count="4">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; padding:6px 11px; border-radius:999px; background:{{ c.bg }}; color:{{ c.fg }}">{{ c.count }} {{ c.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:#f7ecdc; border-radius:24px; padding:20px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:12px">Arcos</div>
+            <div style="display:flex; flex-direction:column; gap:12px">
+              <sc-for list="{{ arcs }}" as="a" hint-placeholder-count="3">
+                <div>
+                  <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#2a1b12">
+                    <span style="width:9px; height:9px; border-radius:999px; background:{{ a.color }}"></span>
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ a.title }}</span>
+                    <span style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.55)">{{ a.count }}</span>
+                  </div>
+                  <div style="display:flex; gap:4px; margin-top:6px">
+                    <sc-for list="{{ a.eps }}" as="x" hint-placeholder-count="2">
+                      <span title="{{ x.title }}" style="flex:1; height:8px; border-radius:999px; background:{{ x.color }}"></span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+
+        <h2 style="font-family:'Instrument Serif',Georgia,serif; font-size:34px; font-weight:400; margin:0 0 12px; color:#2a1b12">Estrutura</h2>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px">
+          <sc-for list="{{ boardTabs }}" as="t" hint-placeholder-count="4">
+            <span onClick="{{ t.pick }}" style="font-size:12.5px; font-weight:600; padding:9px 16px; border-radius:999px; cursor:pointer; background:{{ t.bg }}; color:{{ t.fg }}; border:1.5px solid {{ t.bc }}; white-space:nowrap">{{ t.label }}</span>
+          </sc-for>
+          <sc-if value="{{ hasAddBoards }}" hint-placeholder-val="{{ true }}">
+            <span onClick="{{ toggleAddBoard }}" style="font-size:12.5px; font-weight:600; padding:9px 16px; border-radius:999px; cursor:pointer; background:transparent; color:rgba(247,236,220,.95); border:1.5px dashed rgba(247,236,220,.8); white-space:nowrap">+ adicionar quadro</span>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ addBoardOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin-bottom:18px">
+            <sc-for list="{{ addBoards }}" as="b" hint-placeholder-count="3">
+              <div onClick="{{ b.add }}" style="background:#fffdf7; border-radius:18px; padding:14px 16px; cursor:pointer; box-shadow:0 14px 30px -24px rgba(35,18,9,.7)" style-hover="background:#f7ecdc">
+                <div style="font-size:13.5px; font-weight:700; color:#2a1b12">{{ b.label }}</div>
+                <div style="font-size:12px; color:rgba(42,27,18,.6); margin-top:4px">{{ b.desc }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <div style="background:#f7ecdc; border-radius:24px; padding:22px; margin-bottom:30px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+          <sc-if value="{{ tabAnatomia }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px">
+              <sc-for list="{{ anatomiaFields }}" as="a" hint-placeholder-count="7">
+                <div style="background:#fffdf7; border-radius:18px; padding:14px 16px">
+                  <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#a8432f">{{ a.label }}</div>
+                  <div style="font-size:11.5px; color:rgba(42,27,18,.55); margin:4px 0 8px; line-height:1.35">{{ a.hint }}</div>
+                  <textarea value="{{ a.value }}" onChange="{{ a.onChange }}" rows="2" placeholder="escreva aqui…" style="width:100%; border:0; outline:none; resize:vertical; background:transparent; font-family:'Instrument Serif',Georgia,serif; font-size:17px; line-height:1.35; color:#2a1b12"></textarea>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabJornada }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-wrap:wrap; gap:26px; align-items:center">
+              <div style="position:relative; flex:1 1 440px; max-width:600px; aspect-ratio:1/1; margin:10px auto">
+                <div style="position:absolute; inset:20%; border-radius:50%; background:linear-gradient(180deg,#f7ecdc 0 50%,#1e1b18 50% 100%); box-shadow:inset 0 0 0 3px #2a1b12, 0 24px 50px -24px rgba(35,18,9,.7)"></div>
+                <div style="position:absolute; left:14%; right:14%; top:50%; height:0; border-top:2px dashed #a8432f"></div>
+                <div style="position:absolute; left:50%; top:38%; transform:translate(-50%,-50%); text-align:center; font-family:'Archivo Black',sans-serif; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#2a1b12">Mundo comum</div>
+                <div style="position:absolute; left:50%; top:62%; transform:translate(-50%,-50%); text-align:center; font-family:'Archivo Black',sans-serif; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#f4e9d8">Mundo especial</div>
+                <div style="position:absolute; right:0; top:50%; transform:translateY(-130%); font-family:'JetBrains Mono',monospace; font-size:10px; color:#a8432f; text-transform:uppercase; letter-spacing:.08em">limiar</div>
+                <sc-for list="{{ jNodes }}" as="n" hint-placeholder-count="12">
+                  <div onClick="{{ n.pick }}" style="position:absolute; left:{{ n.left }}; top:{{ n.top }}; width:{{ n.size }}; height:{{ n.size }}; transform:translate(-50%,-50%); border-radius:50%; background:{{ n.bg }}; color:{{ n.fg }}; border:2.5px solid {{ n.bc }}; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black',sans-serif; font-size:16px; cursor:pointer; z-index:2; transition:width .15s, height .15s">{{ n.num }}<sc-if value="{{ n.hasGap }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:-7px; right:-9px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:#ffd84a; color:#5a3e00; border:1.5px dashed #8a5a00; font-family:'JetBrains Mono',monospace; font-size:10.5px; display:flex; align-items:center; justify-content:center">{{ n.gapCount }}</span></sc-if><sc-if value="{{ n.empty }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; inset:-7px; border-radius:50%; border:2px dashed #a8432f; pointer-events:none"></span></sc-if></div>
+                  <div onClick="{{ n.pick }}" style="position:absolute; left:{{ n.lLeft }}; top:{{ n.lTop }}; transform:translate({{ n.lShift }},-50%); width:max-content; max-width:96px; text-align:{{ n.lAlign }}; font-size:11px; font-weight:600; line-height:1.2; color:#2a1b12; cursor:pointer">{{ n.label }}</div>
+                </sc-for>
+              </div>
+              <div style="flex:1 1 280px; min-width:0; background:#fffdf7; border-radius:20px; padding:20px">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <span style="font-family:'Archivo Black',sans-serif; font-size:30px; color:#a8432f">{{ jSelNum }}</span>
+                  <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:rgba(42,27,18,.55)">{{ jSelWorld }}</span>
+                  <span style="margin-left:auto; display:flex; gap:6px">
+                    <span onClick="{{ jPrev }}" style="width:30px; height:30px; border-radius:10px; background:rgba(58,35,24,.1); display:flex; align-items:center; justify-content:center; cursor:pointer">‹</span>
+                    <span onClick="{{ jNext }}" style="width:30px; height:30px; border-radius:10px; background:rgba(58,35,24,.1); display:flex; align-items:center; justify-content:center; cursor:pointer">›</span>
+                  </span>
+                </div>
+                <div style="font-family:'Instrument Serif',Georgia,serif; font-size:28px; color:#2a1b12; margin:4px 0 12px">{{ jSelLabel }}</div>
+                <textarea value="{{ jSelNote }}" onChange="{{ onJNote }}" rows="7" placeholder="O que acontece nesta etapa na sua história? Qual episódio?" style="width:100%; border:0; outline:none; resize:vertical; background:repeating-linear-gradient(#fffdf7 0 25px, rgba(58,35,24,.1) 25px 26px); font-family:'Courier Prime',monospace; font-size:13px; line-height:26px; color:#2a1b12"></textarea>
+                <sc-if value="{{ jSelEmpty }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:10px; font-size:12px; color:#a8432f; font-weight:600">Etapa vazia — nenhum texto ou nota ainda.</div>
+                </sc-if>
+                <sc-if value="{{ jHasSelGaps }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:14px">
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#8a5a00; margin-bottom:8px">Buracos nesta etapa</div>
+                    <div style="display:flex; flex-direction:column; gap:6px">
+                      <sc-for list="{{ jSelGaps }}" as="g" hint-placeholder-count="1">
+                        <div onClick="{{ g.open }}" style="background:#fff3b8; border:1.5px dashed #c98f00; border-radius:12px; padding:8px 10px; cursor:pointer">
+                          <div style="font-size:12.5px; font-style:italic; color:#5a3e00">{{ g.text }}</div>
+                          <div style="font-size:10.5px; color:rgba(90,62,0,.7); margin-top:3px">{{ g.where }} — abrir →</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+                <div style="display:flex; flex-wrap:wrap; gap:6px 14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.6); margin-top:14px; padding-top:12px; border-top:1px solid rgba(58,35,24,.14)">
+                  <span>{{ jFilled }}</span>
+                  <span style="color:#8a5a00">{{ jGapTotal }} buracos nos textos</span>
+                  <span style="color:#a8432f">{{ jEmptyStages }} etapas vazias</span>
+                  <span>{{ jUnplaced }} buracos sem etapa</span>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabPropp }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:rgba(42,27,18,.6); margin-bottom:12px">{{ proppCount }}</div>
+              <div style="display:flex; flex-wrap:wrap; gap:7px">
+                <sc-for list="{{ proppFns }}" as="f" hint-placeholder-count="31">
+                  <span onClick="{{ f.toggle }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:600; padding:7px 13px; border-radius:999px; cursor:pointer; background:{{ f.bg }}; color:{{ f.fg }}; border:1.5px solid {{ f.bc }}">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; opacity:.7">{{ f.num }}</span>{{ f.label }}
+                  </span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabTimeline }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:rgba(42,27,18,.6); margin-bottom:14px">curva de tensão — use + e − em cada episódio</div>
+              <div style="display:flex; align-items:flex-end; gap:12px; overflow-x:auto; padding-bottom:10px; border-bottom:2px solid rgba(58,35,24,.2)">
+                <sc-for list="{{ timelineEps }}" as="t" hint-placeholder-count="4">
+                  <div style="min-width:120px; flex:1; display:flex; flex-direction:column; align-items:center; gap:8px">
+                    <span onClick="{{ t.up }}" style="font-size:15px; color:rgba(42,27,18,.55); cursor:pointer">+</span>
+                    <div onClick="{{ t.open }}" style="width:100%; height:{{ t.height }}; border-radius:14px 14px 0 0; background:{{ t.color }}; display:flex; align-items:flex-start; justify-content:center; padding-top:8px; cursor:pointer">
+                      <span style="font-family:'Archivo Black',sans-serif; font-size:14px; color:{{ t.ink }}">{{ t.num }}</span>
+                    </div>
+                    <span onClick="{{ t.down }}" style="font-size:15px; color:rgba(42,27,18,.55); cursor:pointer">−</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex; gap:12px; margin-top:10px">
+                <sc-for list="{{ timelineEps }}" as="t" hint-placeholder-count="4">
+                  <div style="min-width:120px; flex:1; font-size:12px; color:rgba(42,27,18,.7); text-align:center; line-height:1.3">{{ t.title }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabFichas }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display:flex; gap:4px; overflow-x:auto; padding-bottom:10px; margin-bottom:14px">
+                <sc-for list="{{ stcBeats }}" as="b" hint-placeholder-count="15">
+                  <div style="flex:1; min-width:92px; background:#fffdf7; border-radius:10px; padding:7px 9px">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#a8432f">p. {{ b.page }}</div>
+                    <div style="font-size:11px; font-weight:600; color:#2a1b12; line-height:1.2; margin-top:2px">{{ b.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:12px; font-size:11.5px; color:rgba(42,27,18,.65)">
+                <span><b style="font-family:'JetBrains Mono',monospace">+/−</b> mudança emocional da cena</span>
+                <span><b style="font-family:'JetBrains Mono',monospace">&gt;&lt;</b> quem contra quem</span>
+                <span>cor = trama A / B / C</span>
+                <span style="margin-left:auto; font-family:'JetBrains Mono',monospace">{{ stcCount }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:12px">
+                <sc-for list="{{ stcRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex; gap:12px; background:#5c3a26; border-radius:18px; padding:12px; overflow-x:auto; background-image:radial-gradient(rgba(0,0,0,.18) 1px, transparent 1px); background-size:6px 6px">
+                    <div style="flex-shrink:0; width:74px; display:flex; flex-direction:column; justify-content:center; color:#f4e9d8">
+                      <div style="font-family:'Archivo Black',sans-serif; font-size:15px; text-transform:uppercase">{{ r.title }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; opacity:.7; margin-top:3px">{{ r.pages }}</div>
+                    </div>
+                    <sc-for list="{{ r.cards }}" as="c" hint-placeholder-count="3">
+                      <div style="flex-shrink:0; width:212px; background:#fffdf7; border-radius:3px; box-shadow:0 8px 16px -8px rgba(0,0,0,.6); display:flex; flex-direction:column; border-top:7px solid {{ c.storyColor }}">
+                        <div style="display:flex; align-items:center; gap:6px; padding:7px 9px 0">
+                          <span onClick="{{ c.cycleStory }}" style="font-size:9.5px; font-weight:700; text-transform:uppercase; padding:3px 7px; border-radius:999px; background:{{ c.storyColor }}; color:{{ c.storyInk }}; cursor:pointer">{{ c.storyLabel }}</span>
+                          <span onClick="{{ c.cycleBeat }}" title="Beat" style="font-size:10px; color:rgba(42,27,18,.55); cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1">{{ c.beat }}</span>
+                          <span onClick="{{ c.up }}" style="cursor:pointer; color:rgba(42,27,18,.45); font-size:11px">▲</span>
+                          <span onClick="{{ c.down }}" style="cursor:pointer; color:rgba(42,27,18,.45); font-size:11px">▼</span>
+                          <span onClick="{{ c.remove }}" style="cursor:pointer; color:rgba(42,27,18,.4); font-size:14px">×</span>
+                        </div>
+                        <input value="{{ c.title }}" onChange="{{ c.onTitle }}" style="border:0; outline:none; background:transparent; padding:6px 9px 2px; font-family:'Courier Prime',monospace; font-weight:700; font-size:11.5px; text-transform:uppercase; color:#2a1b12" />
+                        <textarea value="{{ c.text }}" onChange="{{ c.onText }}" rows="3" placeholder="o que acontece…" style="border:0; outline:none; resize:none; background:transparent; padding:2px 9px; font-family:'Courier Prime',monospace; font-size:12px; line-height:1.35; color:#2a1b12"></textarea>
+                        <div style="display:flex; align-items:center; gap:6px; padding:6px 9px 8px; border-top:1px dashed rgba(58,35,24,.2); margin-top:auto">
+                          <span onClick="{{ c.cycleEmo }}" title="Mudança emocional" style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px; color:{{ c.emoColor }}; cursor:pointer; flex-shrink:0">{{ c.emo }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px; color:#2a1b12; flex-shrink:0">&gt;&lt;</span>
+                          <input value="{{ c.conflict }}" onChange="{{ c.onConflict }}" placeholder="quem contra quem" style="flex:1; min-width:0; border:0; outline:none; background:transparent; font-size:11px; color:rgba(42,27,18,.75)" />
+                        </div>
+                      </div>
+                    </sc-for>
+                    <div onClick="{{ r.add }}" style="flex-shrink:0; width:120px; border:2px dashed rgba(244,233,216,.55); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#f4e9d8; font-size:12px; font-weight:600; cursor:pointer; min-height:150px">+ ficha</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabAtos }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start">
+              <div style="flex:3 1 560px; min-width:0; background:#fffdf7; border-radius:18px; padding:14px 12px 6px">
+                <div style="position:relative; width:100%; aspect-ratio:1000/430">
+                <svg viewBox="0 0 1000 430" style="position:absolute; inset:0; width:100%; height:100%; display:block; font-family:'Instrument Serif',Georgia,serif">
+                  <line x1="20" y1="360" x2="990" y2="360" stroke="#2a1b12" stroke-width="2"></line>
+                  <line x1="300" y1="60" x2="300" y2="428" stroke="#2a1b12" stroke-width="1.5"></line>
+                  <line x1="545" y1="245" x2="545" y2="360" stroke="#2a1b12" stroke-width="1.2" stroke-dasharray="4 5"></line>
+                  <line x1="795" y1="40" x2="795" y2="428" stroke="#2a1b12" stroke-width="1.5"></line>
+                  <polyline points="40,360 795,160 975,360" fill="none" stroke="#2a1b12" stroke-width="13" stroke-linejoin="miter"></polyline>
+                  <text x="395" y="300" transform="rotate(-14.8 395 300)" font-size="18" font-style="italic" fill="#2a1b12">ação ascendente</text>
+                  
+                  <text x="170" y="394" text-anchor="middle" font-size="26" fill="#2a1b12">Ato 1</text>
+                  <text x="170" y="418" text-anchor="middle" font-size="15" fill="#6b5a4e">preparação</text>
+                  <text x="547" y="394" text-anchor="middle" font-size="26" fill="#2a1b12">Ato 2</text>
+                  <text x="547" y="418" text-anchor="middle" font-size="15" fill="#6b5a4e">confronto</text>
+                  <text x="892" y="394" text-anchor="middle" font-size="26" fill="#2a1b12">Ato 3</text>
+                  <text x="892" y="418" text-anchor="middle" font-size="15" fill="#6b5a4e">resolução</text>
+                  <sc-for list="{{ aBeats }}" as="b" hint-placeholder-count="14">
+                    <g onClick="{{ b.pick }}" style="cursor:pointer">
+                      <line x1="{{ b.x }}" y1="{{ b.y }}" x2="{{ b.x }}" y2="{{ b.tickTop }}" stroke="#2a1b12" stroke-width="1.5"></line>
+                      <polygon points="{{ b.shape }}" fill="{{ b.fill }}" stroke="#2a1b12" stroke-width="2"></polygon>
+                    </g>
+                  </sc-for>
+                </svg>
+                <sc-for list="{{ aBeats }}" as="b" hint-placeholder-count="14">
+                  <div onClick="{{ b.pick }}" style="position:absolute; left:{{ b.lx }}; top:{{ b.ly }}; transform:translate({{ b.tx }},-100%); width:max-content; max-width:110px; text-align:{{ b.anchor }}; font-family:'Instrument Serif',Georgia,serif; font-size:clamp(10px,1.35vw,15px); line-height:1.05; font-weight:{{ b.weight }}; color:{{ b.ink }}; cursor:pointer">{{ b.label }}</div>
+                </sc-for>
+                </div>
+              </div>
+              <div style="flex:1 1 260px; min-width:0; background:#fffdf7; border-radius:18px; padding:18px">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <span style="font-family:'Archivo Black',sans-serif; font-size:28px; color:#a8432f">{{ aSelNum }}</span>
+                  <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:rgba(42,27,18,.55)">{{ aSelAct }}</span>
+                  <span style="margin-left:auto; display:flex; gap:6px">
+                    <span onClick="{{ aPrev }}" style="width:30px; height:30px; border-radius:10px; background:rgba(58,35,24,.1); display:flex; align-items:center; justify-content:center; cursor:pointer">‹</span>
+                    <span onClick="{{ aNext }}" style="width:30px; height:30px; border-radius:10px; background:rgba(58,35,24,.1); display:flex; align-items:center; justify-content:center; cursor:pointer">›</span>
+                  </span>
+                </div>
+                <div style="font-family:'Instrument Serif',Georgia,serif; font-size:27px; color:#2a1b12; margin:4px 0 12px">{{ aSelLabel }}</div>
+                <textarea value="{{ aSelNote }}" onChange="{{ onANote }}" rows="6" placeholder="O que acontece aqui na sua história?" style="width:100%; border:0; outline:none; resize:vertical; background:repeating-linear-gradient(#fffdf7 0 25px, rgba(58,35,24,.1) 25px 26px); font-family:'Courier Prime',monospace; font-size:13px; line-height:26px; color:#2a1b12"></textarea>
+                <sc-if value="{{ isSerieScope }}" hint-placeholder-val="{{ true }}">
+                  <span onClick="{{ cycleAEp }}" style="display:inline-block; margin-top:10px; font-size:12px; font-weight:600; padding:7px 13px; border-radius:999px; border:1.5px solid rgba(58,35,24,.24); color:#3a2318; cursor:pointer">{{ aEpLabel }}</span>
+                </sc-if>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.55); margin-top:12px">{{ aFilled }}</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabEscaleta }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px">
+                <p style="flex:1 1 320px; margin:0; font-size:13px; line-height:1.5; color:rgba(42,27,18,.75)">Escaleta é a lista das cenas em ordem, uma linha por cena: onde acontece e o que muda. Sem diálogo. É a ponte entre a ideia e o roteiro — quando estiver boa, vira o esqueleto do vomit draft.</p>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.6); padding-top:10px">{{ escCount }}</span>
+                <span onClick="{{ escToDraft }}" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:#25a244; color:#0d2a12; font-size:13px; font-weight:700; border-radius:999px; padding:10px 17px; cursor:pointer">Virar vomit draft →</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px">
+                <sc-for list="{{ escRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:10px; background:#fffdf7; border-radius:12px; padding:8px 12px; flex-wrap:wrap">
+                    <span style="font-family:'Archivo Black',sans-serif; font-size:14px; color:#a8432f; flex-shrink:0">{{ r.num }}</span>
+                    <input value="{{ r.heading }}" onChange="{{ r.onHeading }}" style="flex:1 1 220px; min-width:0; border:0; outline:none; background:transparent; font-family:'Courier Prime',monospace; font-weight:700; font-size:13px; text-transform:uppercase; color:#2a1b12" />
+                    <input value="{{ r.text }}" onChange="{{ r.onText }}" placeholder="o que acontece e o que muda…" style="flex:2 1 280px; min-width:0; border:0; outline:none; background:transparent; font-family:'Courier Prime',monospace; font-size:13px; color:#2a1b12" />
+                    <span style="display:flex; gap:8px; flex-shrink:0; color:rgba(42,27,18,.45); font-size:12px">
+                      <span onClick="{{ r.up }}" style="cursor:pointer">▲</span>
+                      <span onClick="{{ r.down }}" style="cursor:pointer">▼</span>
+                      <span onClick="{{ r.remove }}" style="cursor:pointer; font-size:15px">×</span>
+                    </span>
+                  </div>
+                </sc-for>
+                <div onClick="{{ addEsc }}" style="border:2px dashed rgba(58,35,24,.28); border-radius:12px; padding:10px; text-align:center; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.6); cursor:pointer">+ cena</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabPostits }}" hint-placeholder-val="{{ false }}">
+            <div style="position:{{ wallPos }}; inset:{{ wallInset }}; z-index:{{ wallZ }}; padding:{{ wallPad }}; background:{{ wallOuterBg }}; display:flex; flex-direction:column; height:{{ wallOuterH }}">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px">
+                <div style="display:flex; gap:3px; background:#fffdf7; border-radius:999px; padding:4px">
+                  <sc-for list="{{ wallTools }}" as="t" hint-placeholder-count="3">
+                    <span onClick="{{ t.pick }}" style="font-size:12px; font-weight:600; padding:7px 14px; border-radius:999px; cursor:pointer; background:{{ t.bg }}; color:{{ t.fg }}">{{ t.label }}</span>
+                  </sc-for>
+                </div>
+                <div style="display:flex; gap:7px; align-items:center; background:#fffdf7; border-radius:999px; padding:7px 12px">
+                  <span style="font-size:11px; color:rgba(42,27,18,.55)">post-it</span>
+                  <sc-for list="{{ wallNoteColors }}" as="c" hint-placeholder-count="6">
+                    <span onClick="{{ c.pick }}" style="width:18px; height:18px; border-radius:4px; background:{{ c.c }}; cursor:pointer; box-shadow:{{ c.ring }}"></span>
+                  </sc-for>
+                </div>
+                <div style="display:flex; gap:7px; align-items:center; background:#fffdf7; border-radius:999px; padding:7px 12px">
+                  <span style="font-size:11px; color:rgba(42,27,18,.55)">caneta</span>
+                  <sc-for list="{{ wallPens }}" as="c" hint-placeholder-count="4">
+                    <span onClick="{{ c.pick }}" style="width:16px; height:16px; border-radius:50%; background:{{ c.c }}; cursor:pointer; box-shadow:{{ c.ring }}"></span>
+                  </sc-for>
+                  <span onClick="{{ wallClear }}" style="font-size:11px; font-weight:600; color:#a8432f; cursor:pointer; margin-left:4px">apagar traços</span>
+                </div>
+                <div style="margin-left:auto; display:flex; gap:4px; align-items:center; background:#fffdf7; border-radius:999px; padding:4px 6px">
+                  <span onClick="{{ wallZoomOut }}" style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer">−</span>
+                  <span onClick="{{ wallReset }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; min-width:44px; text-align:center; cursor:pointer">{{ wallZoom }}</span>
+                  <span onClick="{{ wallZoomIn }}" style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer">+</span>
+                </div>
+                <span onClick="{{ toggleWallFull }}" title="Tela cheia (Esc para sair)" style="display:inline-flex; align-items:center; gap:7px; background:#2a1b12; color:#f7ecdc; font-size:12px; font-weight:600; border-radius:999px; padding:9px 15px; cursor:pointer; white-space:nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg>
+                  {{ wallFullLabel }}
+                </span>
+              </div>
+              <div data-wall="true" onPointerDown="{{ wallDown }}" onPointerMove="{{ wallMove }}" onPointerUp="{{ wallUp }}" onPointerLeave="{{ wallUp }}" style="position:relative; height:{{ wallH }}; flex:{{ wallFlex }}; min-height:0; border-radius:20px; overflow:hidden; background-color:#efe6d6; background-image:radial-gradient(rgba(58,35,24,.22) 1.2px, transparent 1.2px); background-size:{{ wallGrid }}; background-position:{{ wallGridPos }}; cursor:{{ wallCursor }}; touch-action:none; user-select:none; box-shadow:inset 0 0 0 1px rgba(58,35,24,.14)">
+                <div style="position:absolute; left:0; top:0; transform-origin:0 0; transform:{{ wallTransform }}">
+                  <sc-for list="{{ wallGroups }}" as="g" hint-placeholder-count="0">
+                    <div style="position:absolute; left:{{ g.left }}; top:{{ g.top }}; width:{{ g.w }}; height:{{ g.h }}; border:2px dashed {{ g.color }}; background:{{ g.tint }}; border-radius:18px; pointer-events:none">
+                      <div onPointerDown="{{ g.grab }}" style="position:absolute; left:12px; top:-15px; display:flex; align-items:center; gap:6px; background:{{ g.color }}; color:#fff; border-radius:999px; padding:4px 6px 4px 12px; cursor:move; pointer-events:{{ g.pe }}">
+                        <input value="{{ g.title }}" onChange="{{ g.onTitle }}" onPointerDown="{{ g.stop }}" style="border:0; outline:none; background:transparent; color:#fff; font-size:12px; font-weight:700; width:{{ g.titleW }}" />
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; opacity:.85">{{ g.count }}</span>
+                        <span onPointerDown="{{ g.remove }}" style="cursor:pointer; font-size:13px; padding:0 4px">×</span>
+                      </div>
+                      <div onPointerDown="{{ g.rgrab }}" title="redimensionar grupo" style="position:absolute; right:-7px; bottom:-7px; width:16px; height:16px; border-radius:4px; background:{{ g.color }}; cursor:nwse-resize; pointer-events:{{ g.pe }}"></div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ hasTmpGroup }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; left:{{ tmpGL }}; top:{{ tmpGT }}; width:{{ tmpGW }}; height:{{ tmpGH }}; border:2px dashed #2a1b12; border-radius:18px; background:rgba(42,27,18,.05)"></div>
+                  </sc-if>
+                  <sc-for list="{{ wallNotes }}" as="n" hint-placeholder-count="4">
+                    <div style="position:absolute; left:{{ n.left }}; top:{{ n.top }}; width:{{ n.w }}; height:{{ n.h }}; background:{{ n.color }}; box-shadow:{{ n.ring }}; display:flex; flex-direction:column; pointer-events:{{ n.pe }}">
+                      <div onPointerDown="{{ n.grab }}" style="height:22px; flex-shrink:0; cursor:move; display:flex; align-items:center; justify-content:flex-end; padding:0 6px; background:rgba(0,0,0,.05)">
+                        <span onPointerDown="{{ n.remove }}" style="cursor:pointer; font-size:13px; color:rgba(42,27,18,.5)">×</span>
+                      </div>
+                      <textarea value="{{ n.text }}" onChange="{{ n.onText }}" onPointerDown="{{ n.stop }}" placeholder="escreva…" style="flex:1; min-height:0; border:0; outline:none; resize:none; background:transparent; padding:8px 12px 14px; font-family:'Instrument Serif',Georgia,serif; font-size:18px; line-height:1.25; color:#2a1b12"></textarea>
+                      <div onPointerDown="{{ n.rgrab }}" title="redimensionar" style="position:absolute; right:0; bottom:0; width:18px; height:18px; cursor:nwse-resize; background:linear-gradient(135deg, transparent 50%, rgba(42,27,18,.3) 50%)"></div>
+                    </div>
+                  </sc-for>
+                  <svg width="1" height="1" style="position:absolute; left:0; top:0; overflow:visible; pointer-events:none">
+                    <sc-for list="{{ wallStrokes }}" as="s" hint-placeholder-count="0">
+                      <path d="{{ s.d }}" stroke="{{ s.color }}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </sc-for>
+                    <path d="{{ wallTmp }}" stroke="{{ wallTmpColor }}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </div>
+                <div style="position:absolute; left:14px; bottom:12px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:rgba(42,27,18,.5); pointer-events:none">fundo = navegar · roda = zoom · faixa do post-it = mover · canto = redimensionar · Caneta desenha por cima de tudo · Grupo: arraste pra criar uma moldura</div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ isSerieScope }}" hint-placeholder-val="{{ true }}">
+        <div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:14px; flex-wrap:wrap">
+          <h2 style="font-family:'Instrument Serif',Georgia,serif; font-size:34px; font-weight:400; margin:0; color:#2a1b12">Grade de episódios</h2>
+          <div onClick="{{ addPlanned }}" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:#2a1b12; color:#f7ecdc; font-size:13px; font-weight:600; border-radius:999px; padding:11px 18px; cursor:pointer" style-hover="background:#000">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            Episódio previsto
+          </div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px">
+          <sc-for list="{{ statusLegend }}" as="l" hint-placeholder-count="4">
+            <span title="{{ l.desc }}" style="display:inline-flex; align-items:center; gap:7px; font-size:11.5px; color:rgba(42,27,18,.7)">
+              <span style="width:9px; height:9px; border-radius:999px; background:{{ l.bg }}"></span>{{ l.label }}
+            </span>
+          </sc-for>
+          <span style="font-size:11.5px; color:rgba(42,27,18,.5); margin-left:6px">clique nas etiquetas da grade pra trocar</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <sc-for list="{{ planRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:14px; background:#f7ecdc; border-radius:18px; padding:14px 16px; box-shadow:0 14px 30px -24px rgba(35,18,9,.7); opacity:{{ r.dim }}; flex-wrap:wrap">
+              <span style="font-family:'Archivo Black',sans-serif; font-size:17px; color:{{ r.arcColor }}; flex-shrink:0">{{ r.num }}</span>
+              <span onClick="{{ r.open }}" style="flex:1; min-width:160px; cursor:pointer">
+                <span style="font-family:'Instrument Serif',Georgia,serif; font-size:21px; color:#2a1b12; display:block; line-height:1.15">{{ r.title }}</span>
+                <span style="font-size:12px; color:rgba(42,27,18,.6); display:block; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ r.logline }}</span>
+              </span>
+              <span onClick="{{ r.cycleFunc }}" title="Função na série" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:6px 11px; border-radius:999px; border:1.5px solid rgba(58,35,24,.24); color:#3a2318; cursor:pointer; white-space:nowrap" style-hover="border-color:#a8432f; color:#a8432f">{{ r.func }}</span>
+              <span onClick="{{ r.cycleArc }}" title="Arco" style="font-size:11.5px; font-weight:600; padding:6px 11px; border-radius:999px; background:rgba(58,35,24,.08); color:{{ r.arcColor }}; cursor:pointer; white-space:nowrap; max-width:200px; overflow:hidden; text-overflow:ellipsis">{{ r.arcTitle }}</span>
+              <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:6px 11px; border-radius:999px; background:{{ r.phaseColor }}; color:{{ r.phaseInk }}; white-space:nowrap">{{ r.phaseLabel }}</span>
+              <span onClick="{{ r.cycle }}" title="Canônico, temporário, ideia ou descartado" style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:6px 12px; border-radius:999px; background:{{ r.statusBg }}; color:{{ r.statusFg }}; cursor:pointer; white-space:nowrap">{{ r.statusLabel }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.5); white-space:nowrap">{{ r.docCount }}</span>
+            </div>
+          </sc-for>
+          <div onClick="{{ addPlanned }}" style="border:2px dashed rgba(247,236,220,.75); border-radius:18px; padding:14px; text-align:center; font-size:12.5px; font-weight:600; color:rgba(247,236,220,.92); cursor:pointer" style-hover="background:rgba(247,236,220,.12)">+ episódio previsto</div>
+        </div>
+        </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isIdeation }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1000px">
+        <div onClick="{{ goSerie }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.7); cursor:pointer; margin-bottom:12px" style-hover="color:#2a1b12">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+          {{ serieTitle }}
+        </div>
+        <header style="margin-bottom:20px">
+          <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:52px; line-height:1; font-weight:400; margin:0; color:#2a1b12">Ideação da história</h1>
+          <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">Vale para a história inteira, não para um episódio só. Destaque o que quiser puxar depois.</p>
+        </header>
+
+        <div style="background:#f7ecdc; border-radius:26px; padding:18px; box-shadow:0 18px 38px -20px rgba(35,18,9,.6); margin-bottom:20px">
+          <input value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="Anote antes que escape…" style="width:100%; border:0; outline:none; background:transparent; font-family:'Instrument Serif',Georgia,serif; font-size:24px; color:#2a1b12; padding:6px 2px" />
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center">
+            <sc-for list="{{ kinds }}" as="k" hint-placeholder-count="6">
+              <span onClick="{{ k.pick }}" style="font-size:12px; font-weight:600; padding:7px 13px; border-radius:999px; cursor:pointer; background:{{ k.bg }}; color:{{ k.fg }}; border:1.5px solid {{ k.bc }}">{{ k.label }}</span>
+            </sc-for>
+            <span onClick="{{ addIdea }}" style="margin-left:auto; background:#2a1b12; color:#f7ecdc; font-size:13px; font-weight:600; border-radius:999px; padding:9px 18px; cursor:pointer">Guardar ideia</span>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+            <span onClick="{{ f.pick }}" style="font-size:12px; font-weight:600; padding:8px 15px; border-radius:999px; cursor:pointer; background:{{ f.bg }}; color:{{ f.fg }}; border:1.5px solid {{ f.bc }}">{{ f.label }}</span>
+          </sc-for>
+          <span style="margin-left:6px; font-size:12.5px; color:rgba(42,27,18,.6)">{{ shownCount }}</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(258px,1fr)); gap:16px">
+          <sc-for list="{{ ideaCards }}" as="i" hint-placeholder-count="6">
+            <div style="position:relative; background:{{ i.bg }}; border-radius:20px; padding:16px; box-shadow:{{ i.shadow }}; transform:rotate({{ i.rot }}); transition:transform .18s ease" style-hover="transform:rotate(0deg)">
+              <div style="display:flex; align-items:center; gap:8px">
+                <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:rgba(42,27,18,.55)">{{ i.kind }}</span>
+                <span onClick="{{ i.pin }}" title="Destacar" style="margin-left:auto; width:26px; height:26px; border-radius:9px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:{{ i.pinBg }}; color:{{ i.pinFg }}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{{ i.pinFill }}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"></path></svg>
+                </span>
+              </div>
+              <p style="font-family:'Instrument Serif',Georgia,serif; font-size:20px; line-height:1.22; margin:10px 0 12px; color:#2a1b12">{{ i.text }}</p>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px; color:rgba(42,27,18,.55)">
+                <span>{{ i.when }}</span>
+                <span onClick="{{ i.promote }}" style="font-weight:600; cursor:pointer; color:#a8432f">virar episódio →</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isEpisode }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div onClick="{{ goSerie }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.7); cursor:pointer; margin-bottom:12px" style-hover="color:#2a1b12">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+          {{ serieTitle }}
+        </div>
+        <header style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:26px">
+          <div>
+            <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:52px; line-height:1; font-weight:400; margin:0; color:#2a1b12">{{ episodeTitle }}</h1>
+            <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">As fases deste episódio. Cada fase guarda quantos textos você quiser — dá pra ter três vomit drafts e escolher um depois.</p>
+          </div>
+        </header>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-bottom:34px">
+          <div style="background:#f7ecdc; border-radius:24px; padding:20px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55)">Pergunta dramática do episódio</span>
+              <span onClick="{{ cycleEpStatus }}" style="margin-left:auto; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:5px 11px; border-radius:999px; cursor:pointer; background:{{ epStatusBg }}; color:{{ epStatusFg }}">{{ epStatusLabel }}</span>
+            </div>
+            <textarea value="{{ epPlanPergunta }}" onChange="{{ onEpPlanPergunta }}" rows="3" placeholder="O que este episódio pergunta — e responde no fim?" style="width:100%; border:0; outline:none; resize:vertical; background:transparent; font-family:'Instrument Serif',Georgia,serif; font-size:21px; line-height:1.3; font-style:italic; color:#2a1b12"></textarea>
+            <div style="font-size:12.5px; color:rgba(42,27,18,.6); margin-top:10px; padding-top:10px; border-top:1px solid rgba(58,35,24,.14)">{{ epLogline }}</div>
+          </div>
+          <div onClick="{{ goEpBrainstorm }}" style="position:relative; overflow:hidden; border-radius:24px; background:#7b3fe4; padding:22px; cursor:pointer; box-shadow:0 20px 42px -20px rgba(35,18,9,.65)" style-hover="transform:translateY(-4px)">
+            <div style="position:absolute; right:-4px; bottom:-30px; font-family:'Archivo Black',sans-serif; font-size:110px; line-height:1; color:rgba(253,246,232,.13)">!</div>
+            <div style="font-family:'Archivo Black',sans-serif; font-size:17px; text-transform:uppercase; color:#fdf6e8">Brainstorming</div>
+            <div style="height:2px; width:30px; background:#f5c518; margin:9px 0 10px"></div>
+            <p style="font-size:12.5px; line-height:1.4; margin:0; color:rgba(253,246,232,.85)">Abre a parede infinita do episódio em tela cheia: post-its, desenho, grupos.</p>
+            <div style="margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(253,246,232,.8)">{{ epNoteCount }} post-its</div>
+          </div>
+          <div onClick="{{ goEpPlan }}" style="position:relative; overflow:hidden; border-radius:24px; background:#a8432f; padding:22px; cursor:pointer; box-shadow:0 20px 42px -20px rgba(35,18,9,.65)" style-hover="transform:translateY(-4px)">
+            <div style="position:absolute; right:-6px; bottom:-34px; font-family:'Archivo Black',sans-serif; font-size:110px; line-height:1; color:rgba(255,241,228,.14)">#</div>
+            <div style="font-family:'Archivo Black',sans-serif; font-size:17px; text-transform:uppercase; color:#fff1e4">Planejamento do episódio</div>
+            <div style="height:2px; width:30px; background:#f5c518; margin:9px 0 10px"></div>
+            <p style="font-size:12.5px; line-height:1.4; margin:0; color:rgba(255,241,228,.85)">Anatomia, escaleta, linha do tempo em 3 atos, fichas Save the Cat.</p>
+            <div style="margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(255,241,228,.8)">{{ epEscCount }} cenas na escaleta</div>
+          </div>
+        </div>
+
+        <h2 style="font-family:'Instrument Serif',Georgia,serif; font-size:30px; font-weight:400; margin:0 0 14px; color:#2a1b12">Fases do episódio</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(236px,1fr)); gap:24px; row-gap:40px">
+          <sc-for list="{{ phaseCards }}" as="p" hint-placeholder-count="7">
+            <div onClick="{{ p.open }}" style="position:relative; aspect-ratio:24/37; cursor:pointer; z-index:1" style-hover="z-index:30">
+              <div style="position:absolute; inset:0; border-radius:30px; overflow:hidden; background:{{ p.color }}; box-shadow:0 22px 46px -16px rgba(35,18,9,.65), 0 0 0 7px {{ p.halo }}">
+                <div style="position:absolute; right:12px; bottom:-18px; font-family:'Archivo Black',sans-serif; font-size:124px; line-height:1; color:{{ p.ghost }}">{{ p.num }}</div>
+                <div style="position:absolute; left:50%; top:34%; width:118px; height:118px; margin-left:-59px; border-radius:999px; border:10px solid {{ p.ghost }}"></div>
+                <div style="position:absolute; left:50%; top:52%; width:64px; height:10px; margin-left:-32px; border-radius:6px; background:{{ p.ghost }}"></div>
+              </div>
+              <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between; padding:16px 18px 20px; pointer-events:none; z-index:2">
+                <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start">
+                  <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:5px 11px; border-radius:999px; background:{{ p.chipBg }}; color:{{ p.ink }}">{{ p.status }}</span>
+                  <sc-if value="{{ p.locked }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:19px; color:{{ p.ink }}; background:{{ p.chipBg }}; padding:6px 12px; border-radius:12px">{{ lockLeft }}</span>
+                  </sc-if>
+                </div>
+                <div>
+                  <div style="font-family:'Archivo Black',system-ui,sans-serif; font-size:20px; line-height:1.05; text-transform:uppercase; color:{{ p.ink }}">{{ p.title }}</div>
+                  <div style="height:2px; width:34px; background:{{ p.rule }}; margin:9px 0 10px"></div>
+                  <p style="font-size:12.5px; line-height:1.4; margin:0; color:{{ p.inkSoft }}">{{ p.desc }}</p>
+                </div>
+              </div>
+              <div style="position:absolute; left:8%; right:8%; top:14%; bottom:26%; z-index:3; transition:transform .34s cubic-bezier(.2,.8,.2,1)" style-hover="transform:translateY(-16%) scale(1.42)">
+                <image-slot id="{{ p.slotId }}" shape="rect" fit="contain" placeholder="{{ p.artHint }}"></image-slot>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPhase }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1040px">
+        <div onClick="{{ goEpisode }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.7); cursor:pointer; margin-bottom:12px" style-hover="color:#2a1b12">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+          {{ episodeTitle }}
+        </div>
+        <header style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:22px">
+          <div>
+            <span style="display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:6px 12px; border-radius:999px; background:{{ phaseColor }}; color:{{ phaseInk }}">{{ serieTitle }} · {{ episodeTitle }}</span>
+            <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:52px; line-height:1; font-weight:400; margin:10px 0 0; color:#2a1b12">{{ phaseTitle }}</h1>
+            <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">{{ phaseDesc }}</p>
+          </div>
+          <div onClick="{{ newDoc }}" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; flex-shrink:0; background:#2a1b12; color:#f7ecdc; font-size:14px; font-weight:600; border-radius:999px; padding:13px 22px; cursor:pointer; box-shadow:0 10px 22px -10px rgba(30,15,8,.8)" style-hover="background:#000">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            {{ newDocLabel }}
+          </div>
+        </header>
+
+        <sc-if value="{{ phaseLocked }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#0f6e63; border-radius:26px; padding:24px; margin-bottom:20px; box-shadow:0 22px 46px -22px rgba(35,18,9,.7); display:flex; align-items:center; gap:22px; flex-wrap:wrap">
+            <div style="min-width:220px">
+              <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(234,250,243,.8)">trancado</div>
+              <div style="font-family:'Instrument Serif',Georgia,serif; font-size:28px; color:#eafaf3; margin-top:6px">Ninguém lê antes da hora</div>
+            </div>
+            <div style="display:flex; gap:10px; margin-left:auto">
+              <sc-for list="{{ clock }}" as="u" hint-placeholder-count="4">
+                <div style="min-width:72px; background:rgba(2,28,24,.32); border-radius:16px; padding:12px 0; text-align:center">
+                  <div style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:26px; color:#eafaf3">{{ u.v }}</div>
+                  <div style="font-size:9.5px; text-transform:uppercase; letter-spacing:.12em; color:rgba(234,250,243,.7); margin-top:3px">{{ u.l }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px">
+          <sc-for list="{{ phaseDocs }}" as="d" hint-placeholder-count="3">
+            <div style="position:relative; background:#f7ecdc; border-radius:24px; padding:18px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+              <div onClick="{{ d.open }}" style="cursor:pointer">
+                <div style="display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:rgba(42,27,18,.5)">
+                  <span style="width:7px; height:7px; border-radius:999px; background:{{ d.dot }}"></span>{{ d.format }}
+                </div>
+                <div style="font-family:'Instrument Serif',Georgia,serif; font-size:26px; line-height:1.1; color:#2a1b12; margin:8px 0 6px">{{ d.title }}</div>
+                <div style="font-size:12px; color:rgba(42,27,18,.6)">{{ d.meta }}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:14px">
+                <span onClick="{{ d.open }}" style="font-size:12px; font-weight:600; color:#f7ecdc; background:#2a1b12; border-radius:999px; padding:7px 14px; cursor:pointer">Abrir</span>
+                <span onClick="{{ d.toggleLink }}" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#3a2318; border:1.5px solid rgba(58,35,24,.24); border-radius:999px; padding:6px 13px; cursor:pointer" style-hover="border-color:#a8432f; color:#a8432f">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1"></path><path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1"></path></svg>
+                  Ligar
+                </span>
+              </div>
+              <sc-if value="{{ d.linkOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; left:14px; right:14px; top:calc(100% - 8px); z-index:50; background:#fffdf7; border-radius:20px; padding:14px; box-shadow:0 26px 50px -18px rgba(35,18,9,.65)">
+                  <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:10px">Ligar a um episódio e fase</div>
+                  <div style="display:flex; flex-direction:column; gap:6px; max-height:280px; overflow-y:auto">
+                    <sc-for list="{{ d.options }}" as="o" hint-placeholder-count="4">
+                      <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:13px; font-size:13px; color:#2a1b12; cursor:pointer; background:{{ o.bg }}" style-hover="background:rgba(58,35,24,.08)">
+                        <span style="width:8px; height:8px; border-radius:999px; background:{{ o.color }}; flex-shrink:0"></span>
+                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ o.label }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div onClick="{{ newDoc }}" style="min-height:150px; border-radius:24px; border:2px dashed rgba(247,236,220,.75); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:rgba(247,236,220,.92)" style-hover="background:rgba(247,236,220,.12)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            <span style="font-size:12.5px; font-weight:600">{{ newDocLabel }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <header style="margin-bottom:22px">
+          <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:56px; line-height:1; font-weight:400; margin:0; color:#2a1b12">Todos os textos</h1>
+          <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">Toda história, todo episódio, toda fase — num lugar só. Use "Ligar" pra mover um texto de episódio ou de fase.</p>
+        </header>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px">
+          <sc-for list="{{ allDocs }}" as="d" hint-placeholder-count="6">
+            <div style="position:relative; background:#f7ecdc; border-radius:24px; padding:18px; box-shadow:0 18px 38px -22px rgba(35,18,9,.6)">
+              <div onClick="{{ d.open }}" style="cursor:pointer">
+                <div style="display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:rgba(42,27,18,.5)">
+                  <span style="width:7px; height:7px; border-radius:999px; background:{{ d.dot }}"></span>{{ d.format }}
+                </div>
+                <div style="font-family:'Instrument Serif',Georgia,serif; font-size:25px; line-height:1.1; color:#2a1b12; margin:8px 0 6px">{{ d.title }}</div>
+                <div style="font-size:12px; color:rgba(42,27,18,.6)">{{ d.meta }}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:14px; flex-wrap:wrap">
+                <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:6px 11px; border-radius:999px; background:{{ d.linkBg }}; color:{{ d.linkFg }}">{{ d.linkLabel }}</span>
+                <span onClick="{{ d.toggleLink }}" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#3a2318; border:1.5px solid rgba(58,35,24,.24); border-radius:999px; padding:6px 13px; cursor:pointer" style-hover="border-color:#a8432f; color:#a8432f">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1"></path><path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1"></path></svg>
+                  Ligar
+                </span>
+              </div>
+              <sc-if value="{{ d.linkOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; left:14px; right:14px; top:calc(100% - 8px); z-index:50; background:#fffdf7; border-radius:20px; padding:14px; box-shadow:0 26px 50px -18px rgba(35,18,9,.65)">
+                  <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:10px">Ligar a um episódio e fase</div>
+                  <div style="display:flex; flex-direction:column; gap:6px; max-height:300px; overflow-y:auto">
+                    <sc-for list="{{ d.options }}" as="o" hint-placeholder-count="5">
+                      <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:13px; font-size:13px; color:#2a1b12; cursor:pointer; background:{{ o.bg }}" style-hover="background:rgba(58,35,24,.08)">
+                        <span style="width:8px; height:8px; border-radius:999px; background:{{ o.color }}; flex-shrink:0"></span>
+                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ o.label }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMaturing }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1060px">
+        <header style="margin-bottom:24px">
+          <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:56px; line-height:1; font-weight:400; margin:0; color:#2a1b12">Maturando</h1>
+          <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">O texto fica longe dos seus olhos até o relógio zerar. Cabeça fria enxerga o que a pressa não vê.</p>
+        </header>
+
+        <div style="display:grid; grid-template-columns:1.1fr .9fr; gap:22px; align-items:start">
+          <div style="background:#0f6e63; border-radius:30px; padding:28px; box-shadow:0 24px 50px -20px rgba(35,18,9,.7)">
+            <div style="display:flex; align-items:center; gap:10px; color:#eafaf3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l4 3"></path></svg>
+              <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.12em">trancado</span>
+            </div>
+            <div style="font-family:'Instrument Serif',Georgia,serif; font-size:34px; color:#eafaf3; margin:14px 0 2px">A Casa Vazia · ep. 01 — vomit draft</div>
+            <div style="font-size:13px; color:rgba(234,250,243,.75)">42 páginas · guardado em 21 de agosto</div>
+            <div style="display:flex; gap:14px; margin:26px 0 22px">
+              <sc-for list="{{ clock }}" as="u" hint-placeholder-count="4">
+                <div style="flex:1; background:rgba(2,28,24,.32); border-radius:18px; padding:14px 0; text-align:center">
+                  <div style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:30px; color:#eafaf3">{{ u.v }}</div>
+                  <div style="font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:rgba(234,250,243,.7); margin-top:4px">{{ u.l }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:8px; border-radius:999px; background:rgba(2,28,24,.3); overflow:hidden">
+              <div style="height:100%; width:62%; background:#7fe0c4; border-radius:999px"></div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; gap:12px">
+              <span style="font-size:12px; color:rgba(234,250,243,.7); min-width:0">Destrava sozinho. Você recebe um aviso.</span>
+              <span style="font-size:12.5px; font-weight:600; white-space:nowrap; flex-shrink:0; color:#eafaf3; border:1.5px solid rgba(234,250,243,.45); border-radius:999px; padding:9px 16px; cursor:pointer" style-hover="background:rgba(234,250,243,.14)">Ver mesmo assim</span>
+            </div>
+          </div>
+
+          <div style="background:#f7ecdc; border-radius:30px; padding:22px; box-shadow:0 20px 42px -22px rgba(35,18,9,.6)">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:12px">Mandar maturar por</div>
+            <div style="display:flex; flex-direction:column; gap:8px">
+              <sc-for list="{{ durations }}" as="d" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; background:{{ d.bg }}; color:{{ d.fg }}; border-radius:16px; padding:13px 16px; cursor:pointer; font-size:14px; font-weight:600">
+                  <span>{{ d.label }}</span>
+                  <span style="font-size:12px; font-weight:500; opacity:.72">{{ d.hint }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:20px; padding-top:18px; border-top:1px solid rgba(58,35,24,.16)">
+              <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:10px">Também maturando</div>
+              <sc-for list="{{ maturingOthers }}" as="m" hint-placeholder-count="2">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; font-size:13.5px; color:#2a1b12">
+                  <span>{{ m.title }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:rgba(42,27,18,.6)">{{ m.left }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <header style="margin-bottom:22px">
+          <h1 style="font-family:'Instrument Serif',Georgia,serif; font-size:56px; line-height:1; font-weight:400; margin:0; color:#2a1b12">Quadro geral</h1>
+          <p style="font-size:14px; margin:8px 0 0; color:rgba(42,27,18,.68)">Todos os textos de todas as histórias, por fase.</p>
+        </header>
+        <div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:14px">
+          <sc-for list="{{ columns }}" as="c" hint-placeholder-count="7">
+            <div style="width:250px; flex-shrink:0; background:rgba(247,236,220,.5); border-radius:24px; padding:14px">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+                <span style="width:10px; height:10px; border-radius:999px; background:{{ c.color }}"></span>
+                <span style="font-size:12.5px; font-weight:700; color:#2a1b12">{{ c.title }}</span>
+                <span style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:rgba(42,27,18,.55)">{{ c.count }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px">
+                <sc-for list="{{ c.cards }}" as="k" hint-placeholder-count="2">
+                  <div onClick="{{ k.open }}" style="background:#fffdf7; border-radius:16px; padding:13px 14px; box-shadow:0 10px 22px -16px rgba(35,18,9,.8); cursor:pointer">
+                    <div style="font-family:'Instrument Serif',Georgia,serif; font-size:19px; line-height:1.15; color:#2a1b12">{{ k.title }}</div>
+                    <div style="font-size:11.5px; color:rgba(42,27,18,.55); margin-top:5px">{{ k.meta }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isWriting }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; inset:0; z-index:200; background:#e7dcc9; display:flex; flex-direction:column">
+        <div style="flex-shrink:0; background:#fffdf7; border-bottom:1px solid rgba(58,35,24,.14)">
+          <div style="display:flex; align-items:center; gap:14px; padding:12px 22px">
+            <span onClick="{{ leaveWriting }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:rgba(42,27,18,.7); cursor:pointer; flex-shrink:0" style-hover="color:#2a1b12">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+              Sair da escrita
+            </span>
+            <span style="width:1px; height:24px; background:rgba(58,35,24,.16)"></span>
+            <span style="flex:1; min-width:0; display:flex; align-items:center; gap:10px">
+              <span style="font-family:'Instrument Serif',Georgia,serif; font-size:23px; color:#2a1b12; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ docTitle }}</span>
+              <span style="flex-shrink:0; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:5px 10px; border-radius:999px; background:{{ docChipBg }}; color:{{ docChipFg }}">{{ docChip }}</span>
+              <span style="font-size:12px; color:rgba(42,27,18,.55); overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ docSub }}</span>
+            </span>
+            <span onClick="{{ togglePanel }}" title="Esconder/mostrar painel (Ctrl+\)" style="flex-shrink:0; height:34px; padding:0 12px; gap:7px; font-size:12.5px; font-weight:600; white-space:nowrap; border-radius:11px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(42,27,18,.7); background:{{ panelBg }}" style-hover="background:rgba(58,35,24,.1)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="6" height="14" rx="1"></rect><path d="M12 8h9"></path><path d="M12 12h9"></path><path d="M12 16h6"></path></svg>
+              {{ panelLabel }}
+            </span>
+            <span style="position:relative; display:flex; gap:8px; flex-shrink:0">
+              <span onClick="{{ toggleSave }}" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:rgba(58,35,24,.08); color:#3a2318; font-size:13px; font-weight:600; border-radius:999px; padding:9px 16px; cursor:pointer" style-hover="background:rgba(58,35,24,.16)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v11"></path><path d="M7 12l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+                Salvar no PC
+              </span>
+              <span onClick="{{ goMaturing }}" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:#0f6e63; color:#eafaf3; font-size:13px; font-weight:600; border-radius:999px; padding:9px 16px; cursor:pointer" style-hover="background:#0b564d">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l4 3"></path></svg>
+                Mandar maturar
+              </span>
+              <sc-if value="{{ saveOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; right:0; top:calc(100% + 10px); z-index:60; width:256px; background:#fffdf7; border-radius:18px; padding:8px; box-shadow:0 26px 50px -18px rgba(35,18,9,.55)">
+                  <sc-for list="{{ saveOptions }}" as="o" hint-placeholder-count="3">
+                    <div onClick="{{ o.run }}" style="padding:11px 13px; border-radius:13px; cursor:pointer" style-hover="background:rgba(58,35,24,.08)">
+                      <div style="font-size:13.5px; font-weight:600; color:#2a1b12">{{ o.label }}</div>
+                      <div style="font-size:11.5px; color:rgba(42,27,18,.58); margin-top:2px">{{ o.hint }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:0 22px 11px">
+            <sc-for list="{{ marks }}" as="m" hint-placeholder-count="6">
+              <span onMouseDown="{{ m.run }}" title="{{ m.hint }}" style="width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(42,27,18,.72); font-family:'Instrument Serif',Georgia,serif; font-size:17px; font-weight:{{ m.weight }}; font-style:{{ m.italic }}; text-decoration:{{ m.deco }}" style-hover="background:rgba(58,35,24,.1)">{{ m.label }}</span>
+            </sc-for>
+            <span onMouseDown="{{ openLinkPick }}" title="Ligar a um post-it, etapa, episódio… (Ctrl+K)" style="display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 11px; border-radius:10px; cursor:pointer; background:#e6edff; color:#2c5bd1; font-size:12.5px; font-weight:700" style-hover="background:#d4e0ff">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1"></path><path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1"></path></svg>
+              Ligação
+            </span>
+            <span style="width:1px; height:22px; background:rgba(58,35,24,.16); margin:0 8px"></span>
+            <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="9">
+              <span onMouseDown="{{ b.run }}" title="{{ b.hint }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:7px 12px; border-radius:999px; cursor:pointer; background:{{ b.bg }}; color:{{ b.fg }}; border:1.5px solid {{ b.bc }}" style-hover="background:#2a1b12; color:#f7ecdc; border-color:#2a1b12">{{ b.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="flex:1; min-height:0; display:flex">
+          <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ true }}">
+            <div style="width:266px; flex-shrink:0; background:#f7ecdc; border-right:1px solid rgba(58,35,24,.14); overflow-y:auto; overflow-x:hidden; padding:20px 16px">
+              <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:10px">Cenas</div>
+              <div style="display:flex; flex-direction:column; gap:3px">
+                <sc-for list="{{ sceneList }}" as="s" hint-placeholder-count="5">
+                  <div onClick="{{ s.jump }}" style="display:flex; align-items:center; gap:9px; min-width:0; padding:8px 10px; border-radius:12px; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:rgba(42,27,18,.8); cursor:pointer" style-hover="background:rgba(58,35,24,.09)">
+                    <span style="color:rgba(42,27,18,.42)">{{ s.num }}</span>
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ s.title }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(58,35,24,.16); display:flex; align-items:center; gap:8px; margin-bottom:9px">
+                <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#8a5a00">Buracos</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:#fff3b8; color:#5a3e00; border:1px dashed #c98f00">{{ gapCount }}</span>
+                <span onClick="{{ nextGap }}" title="Ctrl+Shift+J" style="margin-left:auto; font-size:11px; font-weight:600; color:#8a5a00; cursor:pointer">próximo ↓</span>
+              </div>
+              <sc-if value="{{ hasGaps }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; flex-direction:column; gap:6px">
+                  <sc-for list="{{ gapList }}" as="g" hint-placeholder-count="2">
+                    <div style="background:#fff3b8; border:1.5px dashed #c98f00; border-radius:12px; padding:8px 10px">
+                      <div onClick="{{ g.jump }}" style="font-size:12px; line-height:1.3; color:#5a3e00; font-style:italic; cursor:pointer">{{ g.text }}</div>
+                      <span onClick="{{ g.cycle }}" title="Clique pra escolher a etapa da jornada" style="display:inline-block; margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:10px; padding:3px 8px; border-radius:999px; cursor:pointer; background:{{ g.stageBg }}; color:{{ g.stageFg }}; border:1px solid #c98f00">{{ g.stage }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <div style="font-size:11px; color:rgba(42,27,18,.55); margin-top:8px; line-height:1.4">Travou? <b style="font-family:'JetBrains Mono',monospace">Ctrl+J</b> marca o buraco e você segue escrevendo.</div>
+              <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(58,35,24,.16); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(42,27,18,.55); margin-bottom:9px">Outros textos desta fase</div>
+              <div style="display:flex; flex-direction:column; gap:4px">
+                <sc-for list="{{ siblings }}" as="v" hint-placeholder-count="2">
+                  <div onClick="{{ v.open }}" style="font-size:12.5px; padding:8px 10px; border-radius:12px; cursor:pointer; background:{{ v.bg }}; color:#2a1b12; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" style-hover="background:rgba(58,35,24,.09)">{{ v.title }}</div>
+                </sc-for>
+              </div>
+              <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(58,35,24,.16); font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.8; color:rgba(42,27,18,.55)">
+                <div>Ctrl+K — inserir ligação</div>
+                <div>Ctrl+\ — esconder painel</div>
+                <div>Ctrl+J — marcar buraco</div>
+                <div>Ctrl+Shift+J — próximo buraco</div>
+                <div>Tab — muda o tipo do bloco</div>
+                <div>Ctrl+1/2 — INT. / EXT.</div>
+                <div>Ctrl+4 — personagem</div>
+                <div>Ctrl+6 — diálogo</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <div data-page-scroll="true" style="position:relative; flex:1; min-width:0; overflow-y:auto; overflow-x:hidden; padding:34px clamp(12px,2vw,24px) 120px">
+            <sc-if value="{{ panelHidden }}" hint-placeholder-val="{{ false }}">
+              <span onClick="{{ togglePanel }}" title="Mostrar painel (Ctrl+\)" style="position:sticky; top:0; float:left; margin-left:-14px; width:26px; height:64px; border-radius:0 12px 12px 0; background:#f7ecdc; box-shadow:0 10px 20px -12px rgba(35,18,9,.7); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#3a2318; font-size:15px">›</span>
+            </sc-if>
+            <div style="max-width:880px; margin:0 auto; background:#fffdf7; border-radius:8px; box-shadow:0 26px 60px -30px rgba(35,18,9,.6)">
+              <div data-editor="true" contentEditable="{{ true }}" suppressContentEditableWarning="{{ true }}" spellCheck="{{ true }}" onInput="{{ onInput }}" onKeyDown="{{ onKeyDown }}" onClick="{{ onEditorClick }}" style="padding:clamp(40px,7vw,88px) clamp(22px,7vw,104px) 140px; min-height:74vh; font-family:'Courier Prime',ui-monospace,monospace; font-size:15.5px; line-height:1.62; color:#2a1b12; caret-color:#a8432f"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex-shrink:0; background:#fffdf7; border-top:1px solid rgba(58,35,24,.14); padding:8px 22px; display:flex; align-items:center; gap:18px; font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(42,27,18,.58)">
+          <span>{{ words }} palavras</span>
+          <span>~{{ pages }} páginas</span>
+          <span>{{ sceneCount }} cenas</span>
+          <span onClick="{{ nextGap }}" style="cursor:pointer; color:#8a5a00; background:#fff3b8; border:1px dashed #c98f00; border-radius:999px; padding:1px 9px">{{ gapCount }} buracos</span>
+          <span style="margin-left:auto">{{ savedLabel }}</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ linkPick }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeLinkPick }}" style="position:fixed; inset:0; z-index:600; background:rgba(30,15,8,.35); display:flex; align-items:flex-start; justify-content:center; padding-top:12vh">
+        <div onClick="{{ stopClick }}" style="width:min(520px,92vw); max-height:70vh; display:flex; flex-direction:column; background:#fffdf7; border-radius:22px; box-shadow:0 30px 60px -20px rgba(30,15,8,.7); overflow:hidden">
+          <div style="padding:16px 18px 10px">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#2c5bd1">Inserir ligação</div>
+            <input value="{{ linkQuery }}" onChange="{{ onLinkQuery }}" placeholder="buscar post-it, etapa, episódio, ideia…" style="width:100%; margin-top:8px; border:1.5px solid rgba(58,35,24,.2); border-radius:12px; padding:10px 12px; font-size:14px; outline:none; background:#fff; color:#2a1b12" />
+          </div>
+          <div style="overflow-y:auto; padding:0 10px 12px; display:flex; flex-direction:column; gap:2px">
+            <sc-for list="{{ linkTargets }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.pick }}" style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:12px; cursor:pointer" style-hover="background:rgba(44,91,209,.08)">
+                <span style="width:10px; height:10px; border-radius:3px; background:{{ t.color }}; flex-shrink:0"></span>
+                <span style="font-size:13.5px; color:#2a1b12; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ t.label }}</span>
+                <span style="font-size:10.5px; color:rgba(42,27,18,.5); white-space:nowrap">{{ t.group }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ linkPop }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; left:{{ linkPopX }}; top:{{ linkPopY }}; z-index:600; width:300px; background:#fffdf7; border-radius:18px; padding:14px 16px; box-shadow:0 26px 50px -18px rgba(30,15,8,.7)">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#2c5bd1">{{ linkPopKind }}</span>
+          <span onClick="{{ closePop }}" style="margin-left:auto; cursor:pointer; color:rgba(42,27,18,.45)">×</span>
+        </div>
+        <div style="font-family:'Instrument Serif',Georgia,serif; font-size:20px; color:#2a1b12; margin-top:4px">{{ linkPopLabel }}</div>
+        <p style="font-size:12.5px; line-height:1.4; color:rgba(42,27,18,.7); margin:8px 0 12px">{{ linkPopPreview }}</p>
+        <div style="display:flex; gap:8px">
+          <span onClick="{{ followPop }}" style="background:#2c5bd1; color:#fff; font-size:12.5px; font-weight:700; border-radius:999px; padding:8px 14px; cursor:pointer">Ir até lá →</span>
+          <span onClick="{{ removePop }}" style="font-size:12px; font-weight:600; color:#a8432f; padding:8px 6px; cursor:pointer">remover ligação</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasReturn }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ goBack }}" style="position:fixed; right:22px; bottom:22px; z-index:700; display:flex; align-items:center; gap:10px; background:#2c5bd1; color:#fff; border-radius:999px; padding:12px 20px 12px 16px; cursor:pointer; box-shadow:0 18px 36px -14px rgba(20,30,80,.7); max-width:min(420px,80vw)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+        <span style="font-size:13px; font-weight:700; white-space:nowrap">Voltar ao texto</span>
+        <span style="font-size:12px; opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ returnLabel }}</span>
+      </div>
+    </sc-if>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:880}}">
+const SERIES = [
+  { id: 's1', title: 'A Casa Vazia', kind: 'Série', meta: '3 episódios · mexida ontem', color: '#25a244', glow: 'rgba(255,255,255,.42)', chipBg: '#25a244', chipFg: '#0d2a12' },
+  { id: 's2', title: 'Marina e o Rio', kind: 'Série', meta: '1 episódio · 14 ideias', color: '#7b3fe4', glow: 'rgba(245,197,24,.5)', chipBg: '#7b3fe4', chipFg: '#fdf6e8' },
+  { id: 's3', title: 'Estação Terminal', kind: 'Longa', meta: '1 roteiro · maturando', color: '#0f6e63', glow: 'rgba(127,224,196,.45)', chipBg: '#0f6e63', chipFg: '#eafaf3' },
+  { id: 's4', title: 'Pequenos Monstros', kind: 'Série', meta: '2 episódios', color: '#2c5bd1', glow: 'rgba(240,244,255,.4)', chipBg: '#2c5bd1', chipFg: '#f0f4ff' },
+];
+
+const PHASES = [
+  { id: 'brainstorm', num: '1', title: 'Brainstorming', desc: 'Parede infinita do episódio: post-its, desenho, grupos. Nada vira texto ainda.', noun: 'bagunça', color: '#7b3fe4', ink: '#fdf6e8', inkSoft: 'rgba(253,246,232,.8)', chipBg: 'rgba(18,4,40,.34)', halo: 'rgba(123,63,228,.28)', rule: '#f5c518', ghost: 'rgba(253,246,232,.13)' },
+  { id: 'plan', num: '2', title: 'Planejamento', desc: 'Anatomia, escaleta, linha do tempo em 3 atos. O desenho antes do texto.', noun: 'escaleta', color: '#e8a12a', ink: '#2c1005', inkSoft: 'rgba(44,16,5,.75)', chipBg: 'rgba(255,255,255,.42)', halo: 'rgba(232,161,42,.3)', rule: '#2c1005', ghost: 'rgba(44,16,5,.12)' },
+  { id: 'vomit', num: '3', title: 'Vomit draft', desc: 'Escreve feio de propósito, do começo ao fim, sem voltar pra corrigir.', noun: 'vomit draft', color: '#25a244', ink: '#0d2a12', inkSoft: 'rgba(13,42,18,.75)', chipBg: 'rgba(255,255,255,.42)', halo: 'rgba(37,162,68,.28)', rule: '#0d2a12', ghost: 'rgba(13,42,18,.12)' },
+  { id: 'maturacao', num: '4', title: 'Maturação', desc: 'O texto some dos seus olhos até o relógio zerar.', noun: 'texto trancado', locked: true, color: '#0f6e63', ink: '#eafaf3', inkSoft: 'rgba(234,250,243,.82)', chipBg: 'rgba(2,28,24,.44)', halo: 'rgba(15,110,99,.3)', rule: '#7fe0c4', ghost: 'rgba(234,250,243,.12)' },
+  { id: 'segunda', num: '5', title: '2ª versão', desc: 'Reescreve com a cabeça fria, comparando com o rascunho ruim.', noun: '2ª versão', color: '#2c5bd1', ink: '#f0f4ff', inkSoft: 'rgba(240,244,255,.8)', chipBg: 'rgba(6,18,54,.34)', halo: 'rgba(44,91,209,.28)', rule: '#f5c518', ghost: 'rgba(240,244,255,.13)' },
+  { id: 'refino', num: '6', title: 'Refino', desc: 'Ritmo, continuidade, diálogo. Corta o que não serve à cena.', noun: 'passe de refino', color: '#e8622a', ink: '#2c1005', inkSoft: 'rgba(44,16,5,.75)', chipBg: 'rgba(255,255,255,.42)', halo: 'rgba(232,98,42,.3)', rule: '#2c1005', ghost: 'rgba(44,16,5,.12)' },
+  { id: 'pronto', num: '7', title: 'Pronto (por ora)', desc: 'Versão que você aceita mostrar pra alguém. Sempre dá pra reabrir.', noun: 'versão final', color: '#1e1b18', ink: '#f4e9d8', inkSoft: 'rgba(244,233,216,.72)', chipBg: 'rgba(244,233,216,.18)', halo: 'rgba(30,27,24,.32)', rule: '#f4e9d8', ghost: 'rgba(244,233,216,.1)' },
+];
+
+const EPISODES = [
+  { id: 'e1', serie: 's1', num: '01', title: 'A chegada', logline: 'Três irmãos voltam pra vender a casa da infância e acham uma carta.', phase: 'vomit', status: 'canon', arc: 'a1', func: 'Piloto' },
+  { id: 'e2', serie: 's1', num: '02', title: 'O inventário', logline: 'Dividir os móveis vira dividir a memória.', phase: 'maturacao', status: 'canon', arc: 'a1', func: 'Aprofunda' },
+  { id: 'e3', serie: 's1', num: '03', title: 'A última condição', logline: 'O que a mãe pediu só vale se os três concordarem.', phase: 'brainstorm', status: 'temp', arc: 'a2', func: 'Virada' },
+  { id: 'e4', serie: 's2', num: '01', title: 'O rio sabe', logline: 'Marina descobre de quem o irmão é filho.', phase: 'plan', status: 'canon', arc: 'a1', func: 'Piloto' },
+  { id: 'e5', serie: 's4', num: '01', title: 'A babá nova', logline: 'Ela entende as crianças melhor do que os pais gostariam.', phase: 'segunda', status: 'canon', arc: 'a1', func: 'Piloto' },
+  { id: 'e6', serie: 's4', num: '02', title: 'Regras da casa', logline: 'As crianças escrevem as regras. Os pais assinam sem ler.', phase: 'brainstorm', status: 'idea', arc: 'a1', func: 'Aprofunda' },
+  { id: 'e7', serie: 's3', num: '01', title: 'Estação Terminal', logline: 'O último trem parte sem passageiros.', phase: 'maturacao', status: 'canon', arc: 'a1', func: 'Único' },
+];
+
+const STATUSES = [
+  { id: 'canon', label: 'Canônico', desc: 'Faz parte da história de verdade.', bg: '#25a244', fg: '#0d2a12' },
+  { id: 'temp', label: 'Temporário', desc: 'Está aí pra segurar o lugar. Pode cair.', bg: '#e8a12a', fg: '#2c1005' },
+  { id: 'idea', label: 'Ideia', desc: 'Só uma possibilidade de episódio.', bg: '#7b3fe4', fg: '#fdf6e8' },
+  { id: 'cut', label: 'Descartado', desc: 'Fora da série, guardado por via das dúvidas.', bg: 'rgba(58,35,24,.22)', fg: 'rgba(42,27,18,.7)' },
+];
+const statusOf = (id) => STATUSES.find((s) => s.id === id) || STATUSES[0];
+
+const ARCS = [
+  { id: 'a1', title: 'Arco 1 — a casa ainda de pé', color: '#a8432f' },
+  { id: 'a2', title: 'Arco 2 — o que a carta pede', color: '#2c5bd1' },
+  { id: 'a3', title: 'Arco 3 — depois da venda', color: '#0f6e63' },
+];
+
+const FUNCS = ['Piloto', 'Aprofunda', 'Virada', 'Respiro', 'Clímax', 'Final', 'Único'];
+
+const PLANS = {
+  s1: { premissa: 'Três irmãos têm 30 dias para vender a casa da mãe — e uma condição no testamento que só vale se os três concordarem.', pergunta: 'O que a gente deve a quem já morreu?', formato: 'Série · 30 min', previstos: 6 },
+  s2: { premissa: 'Uma menina descobre que o irmão é filho do homem que afundou a cidade — e o rio é a única testemunha.', pergunta: 'Dá pra amar alguém sabendo de onde ele veio?', formato: 'Série · 50 min', previstos: 8 },
+  s3: { premissa: 'O último trem de uma estação condenada parte sem passageiros, todo dia, há trinta anos.', pergunta: 'Quem fica quando todo mundo vai embora?', formato: 'Longa · 100 min', previstos: 1 },
+  s4: { premissa: 'A babá nova entende as crianças melhor do que os pais gostariam.', pergunta: 'De quem é a casa, afinal?', formato: 'Série · 30 min', previstos: 8 },
+};
+const FORMATS = ['Curta', 'Série · 30 min', 'Série · 50 min', 'Longa · 100 min'];
+
+const ANATOMY = [
+  { key: 'falha', label: 'Falha e necessidade', hint: 'O que nele está quebrado — e o que ele precisa aprender, mesmo sem saber.' },
+  { key: 'desejo', label: 'Desejo', hint: 'O que ele quer, concreto o bastante pra gente torcer.' },
+  { key: 'oponente', label: 'Oponente', hint: 'Quem quer a mesma coisa — e disputa o mesmo terreno.' },
+  { key: 'plano', label: 'Plano', hint: 'Como ele pretende vencer. De preferência, errado.' },
+  { key: 'batalha', label: 'Batalha', hint: 'O confronto final que decide quem fica com o quê.' },
+  { key: 'revelacao', label: 'Autorrevelação', hint: 'O que ele descobre sobre si quando já não dá pra desconversar.' },
+  { key: 'equilibrio', label: 'Novo equilíbrio', hint: 'Como fica o mundo depois — melhor, pior, mas nunca igual.' },
+];
+
+const JOURNEY = [
+  'Mundo comum', 'Chamado à aventura', 'Recusa do chamado', 'Encontro com o mentor',
+  'Travessia do limiar', 'Provas, aliados e inimigos', 'Aproximação da caverna', 'Provação',
+  'Recompensa', 'Caminho de volta', 'Ressurreição', 'Retorno com o elixir',
+];
+
+const PROPP = [
+  'Afastamento', 'Proibição', 'Transgressão', 'Interrogatório', 'Informação', 'Ardil', 'Cumplicidade',
+  'Dano ou carência', 'Mediação', 'Início da reação', 'Partida', 'Primeira função do doador',
+  'Reação do herói', 'Recepção do meio mágico', 'Deslocamento', 'Combate', 'Marca', 'Vitória',
+  'Reparação do dano', 'Regresso', 'Perseguição', 'Salvamento', 'Chegada incógnita', 'Pretensões falsas',
+  'Tarefa difícil', 'Realização', 'Reconhecimento', 'Desmascaramento', 'Transfiguração', 'Castigo', 'Casamento',
+];
+
+const STC_ROWS = [
+  { title: 'Ato 1', pages: 'p. 1–25' },
+  { title: 'Ato 2A', pages: 'p. 25–55' },
+  { title: 'Ato 2B', pages: 'p. 55–85' },
+  { title: 'Ato 3', pages: 'p. 85–110' },
+];
+const STC_BEATS = [
+  { label: 'Imagem de abertura', page: '1' }, { label: 'Tema declarado', page: '5' },
+  { label: 'Preparação', page: '1–10' }, { label: 'Catalisador', page: '12' },
+  { label: 'Debate', page: '12–25' }, { label: 'Virada para o 2', page: '25' },
+  { label: 'História B', page: '30' }, { label: 'Diversão e jogos', page: '30–55' },
+  { label: 'Ponto médio', page: '55' }, { label: 'Os vilões se aproximam', page: '55–75' },
+  { label: 'Tudo está perdido', page: '75' }, { label: 'Noite escura da alma', page: '75–85' },
+  { label: 'Virada para o 3', page: '85' }, { label: 'Final', page: '85–110' },
+  { label: 'Imagem final', page: '110' },
+];
+const STC_EMO = ['+/−', '−/+', '+/+', '−/−'];
+const STC_STORIES = [
+  { id: 'A', label: 'Trama A', color: '#2c5bd1', ink: '#f0f4ff' },
+  { id: 'B', label: 'Trama B', color: '#d62e7b', ink: '#fff0f7' },
+  { id: 'C', label: 'Trama C', color: '#e8a12a', ink: '#2c1005' },
+];
+const STC_SEED = [
+  { row: 0, title: 'EXT. CASA DA MÃE - DIA', text: 'Os três chegam em horários diferentes. Ninguém tem a chave.', emo: '−/+', conflict: 'Marina >< Tiago', story: 'A', beat: 'Imagem de abertura' },
+  { row: 0, title: 'INT. COZINHA - MADRUGADA', text: 'Marina acha a carta atrás da geladeira.', emo: '+/−', conflict: 'Marina >< a mãe (ausente)', story: 'A', beat: 'Catalisador' },
+  { row: 0, title: 'INT. SALA - DIA', text: 'Leem a condição juntos. Tiago quer ignorar.', emo: '+/−', conflict: 'Tiago >< Marina', story: 'A', beat: 'Debate' },
+  { row: 1, title: 'INT. QUARTO DOS FUNDOS - NOITE', text: 'Caio confessa que já tinha visitado a casa.', emo: '−/+', conflict: 'Caio >< a própria culpa', story: 'B', beat: 'História B' },
+  { row: 2, title: 'EXT. QUINTAL - AMANHECER', text: 'A imobiliária aparece antes da hora.', emo: '+/−', conflict: 'irmãos >< corretor', story: 'A', beat: 'Os vilões se aproximam' },
+  { row: 3, title: 'INT. CASA VAZIA - DIA', text: 'A casa sem móveis. Os três no chão.', emo: '−/+', conflict: 'irmãos >< o passado', story: 'A', beat: 'Imagem final' },
+];
+
+const ATOS = [
+  { label: 'Início', x: 40, y: 360, act: 1 },
+  { label: 'Incidente incitante', x: 140, y: 333, act: 1 },
+  { label: 'Dúvidas', x: 225, y: 311, act: 1 },
+  { label: 'Clímax do ato 1', x: 300, y: 291, act: 1, star: true },
+  { label: 'Obstáculo', x: 385, y: 269, act: 2 },
+  { label: 'Obstáculo', x: 465, y: 247, act: 2 },
+  { label: 'Ponto médio', x: 545, y: 226, act: 2, star: true },
+  { label: 'Obstáculo', x: 625, y: 205, act: 2 },
+  { label: 'Desastre', x: 695, y: 187, act: 2 },
+  { label: 'Crise', x: 745, y: 173, act: 2 },
+  { label: 'Clímax do ato 2', x: 795, y: 160, act: 2, star: true },
+  { label: 'Clímax do ato 3', x: 870, y: 243, act: 3, star: true },
+  { label: 'Desfecho', x: 935, y: 315, act: 3 },
+  { label: 'Fim', x: 975, y: 360, act: 3 },
+];
+const ACT_NAMES = { 1: 'Ato 1 · preparação', 2: 'Ato 2 · confronto', 3: 'Ato 3 · resolução' };
+const burst = (x, y, r1, r2, n) => { const out = []; for (let i = 0; i < n * 2; i++) { const a = Math.PI * i / n; const r = i % 2 ? r2 : r1; out.push((x + Math.cos(a) * r).toFixed(1) + ',' + (y + Math.sin(a) * r).toFixed(1)); } return out.join(' '); };
+const ESC_SEED = [
+  { heading: 'EXT. CASA DA MÃE - DIA', text: 'Os três chegam em horários diferentes. Ninguém tem a chave.' },
+  { heading: 'INT. SALA - DIA', text: 'Móveis cobertos com lençol. Tiago já quer ligar pra imobiliária.' },
+  { heading: 'INT. COZINHA - MADRUGADA', text: 'Marina acha a carta atrás da geladeira.' },
+  { heading: 'EXT. QUINTAL - AMANHECER', text: 'Ela lê em voz alta. A condição só vale se os três concordarem.' },
+];
+const LINK_STYLE = "display:inline-flex; align-items:center; gap:4px; padding:1px 9px; margin:0 2px; border-radius:999px; background:#e6edff; color:#2c5bd1; font-family:system-ui,sans-serif; font-size:12px; font-weight:600; font-style:normal; text-transform:none; cursor:pointer; user-select:none; white-space:nowrap;";
+const short = (t) => { t = (t || '').trim() || 'vazio'; return t.length > 38 ? t.slice(0, 38) + '…' : t; };
+
+const BOARDS = [
+  { id: 'anatomia', label: 'Anatomia da história', desc: 'Falha, desejo, oponente, plano, batalha, autorrevelação, novo equilíbrio.' },
+  { id: 'jornada', label: 'Jornada do herói', desc: 'As 12 etapas, marcando onde a sua história já tem material.' },
+  { id: 'propp', label: '31 funções de Propp', desc: 'Checklist do conto maravilhoso — bom pra achar buraco.' },
+  { id: 'timeline', label: 'Curva de tensão', desc: 'Episódios em sequência com a altura da tensão de cada um.' },
+  { id: 'atos', label: 'Linha do tempo · 3 atos', desc: 'Início, incidente, clímax de cada ato, ponto médio, crise e fim.' },
+  { id: 'escaleta', label: 'Escaleta', desc: 'A lista das cenas em ordem, uma linha cada. Vira vomit draft num clique.' },
+  { id: 'fichas', label: 'Fichas · Save the Cat', desc: 'O quadro de 4 fileiras com +/−, >< e as 15 batidas.' },
+  { id: 'postits', label: 'Parede infinita', desc: 'Post-its, desenho livre, zoom e navegação.' },
+];
+
+const BASE = "font-family:'Courier Prime',ui-monospace,monospace; font-size:15.5px; line-height:1.62; color:#2a1b12; white-space:pre-wrap; ";
+const STYLES = {
+  scene: 'margin:26px 0 12px; text-transform:uppercase; font-weight:700; letter-spacing:.02em;',
+  action: 'margin:0 0 12px;',
+  character: 'margin:14px 0 0; padding-left:38%; text-transform:uppercase;',
+  paren: 'margin:0; padding-left:31%; padding-right:30%; font-style:italic; color:rgba(42,27,18,.72);',
+  dialog: 'margin:0 0 12px; padding-left:22%; padding-right:24%;',
+  transition: 'margin:14px 0 18px; text-align:right; text-transform:uppercase; font-weight:700;',
+  note: 'margin:0 0 12px; font-style:italic; color:rgba(42,27,18,.45);',
+  gap: 'margin:12px 0 16px; padding:10px 14px; border:1.5px dashed #c98f00; border-radius:8px; background:#fff3b8; color:#5a3e00; font-style:italic;',
+};
+const NEXT = { scene: 'action', action: 'action', character: 'dialog', paren: 'dialog', dialog: 'action', transition: 'scene', note: 'action', gap: 'action' };
+const CYCLE = ['action', 'character', 'dialog', 'paren', 'scene', 'transition'];
+
+const BLOCK_BTNS = [
+  { t: 'scene', prefix: 'INT. ', label: 'INT.', hint: 'Cabeçalho de cena interna — Ctrl+1' },
+  { t: 'scene', prefix: 'EXT. ', label: 'EXT.', hint: 'Cabeçalho de cena externa — Ctrl+2' },
+  { t: 'scene', prefix: 'INT./EXT. ', label: 'INT./EXT.', hint: 'Cena mista' },
+  { t: 'action', label: 'Ação', hint: 'Ctrl+3' },
+  { t: 'character', label: 'Personagem', hint: 'Ctrl+4' },
+  { t: 'paren', prefix: '(', label: '(paren.)', hint: 'Ctrl+5' },
+  { t: 'dialog', label: 'Diálogo', hint: 'Ctrl+6' },
+  { t: 'transition', prefix: 'CORTA PARA:', label: 'Transição', hint: 'Ctrl+7' },
+  { t: 'note', prefix: '[[ ', label: 'Nota', hint: 'Lembrete que não entra na exportação limpa' },
+  { t: 'gap', prefix: '??? ', label: '??? Buraco', hint: 'Não sei como continuar — Ctrl+J', hot: true },
+];
+
+const MARKS = [
+  { cmd: 'bold', label: 'B', weight: '700', italic: 'normal', deco: 'none', hint: 'Negrito' },
+  { cmd: 'italic', label: 'I', weight: '400', italic: 'italic', deco: 'none', hint: 'Itálico' },
+  { cmd: 'underline', label: 'U', weight: '400', italic: 'normal', deco: 'underline', hint: 'Sublinhado' },
+  { cmd: 'insertUnorderedList', label: '•', weight: '400', italic: 'normal', deco: 'none', hint: 'Lista' },
+  { cmd: 'undo', label: '↺', weight: '400', italic: 'normal', deco: 'none', hint: 'Desfazer' },
+  { cmd: 'redo', label: '↻', weight: '400', italic: 'normal', deco: 'none', hint: 'Refazer' },
+];
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const blk = (t, text) => '<div data-t="' + t + '" style="' + BASE + STYLES[t] + '">' + esc(text) + '</div>';
+const gapBlk = (text, stage) => '<div data-t="gap" data-stage="' + stage + '" style="' + BASE + STYLES.gap + '">' + esc(text) + '</div>';
+const GAP_CACHE = {};
+function parseGaps(html) {
+  if (!html) return [];
+  if (GAP_CACHE[html]) return GAP_CACHE[html];
+  const d = new DOMParser().parseFromString('<div>' + html + '</div>', 'text/html');
+  const out = Array.prototype.map.call(d.querySelectorAll('[data-t="gap"]'), (n) => ({ text: (n.textContent || '').replace(/^\?+\s*/, '').trim() || '(sem descrição)', stage: n.getAttribute('data-stage') === null || n.getAttribute('data-stage') === '' ? -1 : +n.getAttribute('data-stage') }));
+  GAP_CACHE[html] = out;
+  return out;
+}
+
+const SEED_CASA = [
+  blk('scene', 'INT. COZINHA DA CASA DA MÃE - MADRUGADA'),
+  blk('action', 'A luz da geladeira é a única coisa acesa. MARINA (34) está parada na frente dela há mais tempo do que precisava.'),
+  blk('character', 'TIAGO'),
+  blk('paren', '(da porta)'),
+  blk('dialog', 'Você achou a carta, né.'),
+  blk('action', 'Marina fecha a geladeira. O escuro cobre os dois.'),
+  blk('character', 'MARINA'),
+  blk('dialog', 'Achei. E você já sabia que ela ia deixar isso pra gente.'),
+  gapBlk('??? falta o resto da briga — não sei como o Tiago reage', 7),
+  blk('transition', 'CORTA PARA:'),
+  blk('scene', 'EXT. QUINTAL - AMANHECER'),
+  blk('action', 'O mato tomou conta do que um dia foi horta.'),
+].join('');
+
+const DOCS = [
+  { id: 'd1', ep: 'e1', phase: 'vomit', title: 'Vomit draft — tentativa 1', format: 'Roteiro', meta: '12 cenas · mexido ontem', seed: SEED_CASA },
+  { id: 'd2', ep: 'e1', phase: 'vomit', title: 'Vomit draft — tentativa 2 (mais seca)', format: 'Roteiro', meta: '8 cenas · sem diálogo ainda', seed: blk('scene', 'INT. COZINHA - MADRUGADA') + blk('action', 'Sem falas nessa versão. Só o que dá pra ver.') },
+  { id: 'd3', ep: 'e1', phase: 'plan', title: 'Escaleta em 8 sequências', format: 'Escaleta', meta: '2 páginas', seed: blk('scene', 'SEQUÊNCIA 1 - A CHEGADA') + blk('action', 'Os três chegam em horários diferentes. Ninguém combina nada.') },
+  { id: 'd4', ep: 'e1', phase: 'brainstorm', title: 'Bagunça inicial', format: 'Notas', meta: '19 linhas soltas', seed: gapBlk('??? e se a carta for endereçada só pra um deles?', 1) + blk('action', 'A casa cheira a remédio mesmo depois de limpa.') },
+  { id: 'd5', ep: 'e2', phase: 'maturacao', title: 'Inventário — v1', format: 'Roteiro', meta: '42 páginas · trancado', seed: blk('scene', 'INT. SALA - DIA') + blk('action', 'Etiquetas amarelas em tudo que tem valor.') },
+  { id: 'd6', ep: 'e1', phase: 'segunda', title: 'A chegada — 2ª versão', format: 'Roteiro', meta: 'começando agora', seed: blk('scene', 'INT. COZINHA DA CASA DA MÃE - MADRUGADA') + blk('action', 'Agora com a cabeça fria.') },
+  { id: 'd7', ep: 'e4', phase: 'plan', title: 'Mapa do rio', format: 'Escaleta', meta: '1 página', seed: blk('action', 'O rio aparece em cinco momentos. Sempre mais cheio.') },
+  { id: 'd8', ep: 'e5', phase: 'segunda', title: 'A babá nova — passe 2', format: 'Roteiro', meta: '31 páginas', seed: blk('scene', 'INT. QUARTO DAS CRIANÇAS - NOITE') + blk('action', 'A babá fecha a porta por dentro.') },
+  { id: 'd9', ep: 'e7', phase: 'maturacao', title: 'Estação Terminal — v1', format: 'Roteiro', meta: '96 páginas · trancado', seed: blk('scene', 'EXT. PLATAFORMA - MADRUGADA') + blk('action', 'O trem parte vazio.') },
+];
+
+const IDEAS = [
+  { id: 'i1', serie: 's1', kind: 'Trama', text: 'A casa foi vendida antes do primeiro episódio — e ninguém contou pros irmãos.', when: '2h atrás', bg: '#f4e08a', rot: '-1.4deg', pinned: true },
+  { id: 'i2', serie: 's1', kind: 'Diálogo', text: '"Você achou a carta, né." — e ele não responde.', when: 'ontem', bg: '#f4b7c0', rot: '1.1deg', pinned: false },
+  { id: 'i3', serie: 's1', kind: 'Cena', text: 'Velório onde ninguém chora, todos comem.', when: 'ontem', bg: '#b9e0a5', rot: '-.8deg', pinned: false },
+  { id: 'i4', serie: 's1', kind: 'Mundo', text: 'Toda vez que chove, a casa cheira a remédio.', when: '3d atrás', bg: '#a8d0e6', rot: '1.6deg', pinned: true },
+  { id: 'i5', serie: 's1', kind: 'Personagem', text: 'O irmão do meio mente sobre coisas pequenas e inúteis.', when: '4d atrás', bg: '#c9b6e4', rot: '-1.2deg', pinned: false },
+  { id: 'i6', serie: 's2', kind: 'Trama', text: 'O irmão mais novo da Marina é filho do vilão — e o rio sabe.', when: '1sem atrás', bg: '#f2b26b', rot: '.9deg', pinned: true },
+];
+
+const KINDS = ['Trama', 'Cena', 'Diálogo', 'Personagem', 'Mundo', 'Reviravolta'];
+
+const DURATIONS = [
+  { label: '3 dias', hint: 'só pra perder o vício', bg: 'rgba(58,35,24,.08)', fg: '#2a1b12' },
+  { label: '1 semana', hint: 'o padrão', bg: '#0f6e63', fg: '#eafaf3' },
+  { label: '1 mês', hint: 'esquece de verdade', bg: 'rgba(58,35,24,.08)', fg: '#2a1b12' },
+  { label: 'Escolher data…', hint: '', bg: 'rgba(58,35,24,.08)', fg: '#2a1b12' },
+];
+
+const UNLOCK_AT = Date.now() + 3 * 864e5 + 6 * 36e5 + 12 * 6e4;
+const p2 = (n) => String(Math.floor(n)).padStart(2, '0');
+const phaseOf = (id) => PHASES.find((p) => p.id === id) || PHASES[0];
+let ALL_EPISODES = EPISODES.slice();
+const epOf = (id) => ALL_EPISODES.find((e) => e.id === id);
+
+class Component extends DCLogic {
+  state = {
+    view: 'series', serieId: 's1', episodeId: 'e1', phaseId: 'vomit', docId: 'd1',
+    docs: DOCS, episodes: EPISODES, series: SERIES, ideas: IDEAS, plans: PLANS, epplans: {}, boardTab: 'anatomia',
+    draft: '', draftKind: 'Trama', filter: 'Todas',
+    linkFor: null, saveOpen: false, panel: true, now: Date.now(),
+    words: 0, pages: 0, sceneTitles: [], saved: 'salvo',
+  };
+
+  componentDidMount() {
+    window.addEventListener('keydown', this.onEsc);
+    setTimeout(() => this.bindWall(), 0); this.tick(); }
+  componentDidUpdate() { this.bindWall(); }
+  componentWillUnmount() {
+    if (this.wallEl) this.wallEl.removeEventListener('wheel', this.onWallWheel);
+    window.removeEventListener('keydown', this.onEsc); clearInterval(this.timer); clearTimeout(this.saveT); clearTimeout(this.mountT); }
+  tick() {
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000);
+  }
+
+  set(patch) { this.setState(Object.assign({ saveOpen: false, linkFor: null }, patch)); }
+  go(view) { return () => this.set({ view }); }
+
+  doc() { return this.state.docs.find((d) => d.id === this.state.docId) || this.state.docs[0]; }
+  ed() { return document.querySelector('[data-editor]'); }
+  key() { return 'enredo-doc-' + this.state.docId; }
+
+  mountDoc() {
+    const el = this.ed();
+    if (this.state.view !== 'writing' || !el) return;
+    let html = null;
+    try { html = window.localStorage.getItem(this.key()); } catch (e) { html = null; }
+    el.innerHTML = html || this.doc().seed || blk('scene', 'INT. ');
+    this.refresh();
+    if (this.restoreScroll != null) {
+      const y = this.restoreScroll;
+      this.restoreScroll = null;
+      setTimeout(() => { const box = document.querySelector('[data-page-scroll]'); if (box) box.scrollTop = y; }, 30);
+    }
+  }
+
+  refresh() {
+    const el = this.ed();
+    if (!el) return;
+    const text = el.innerText || '';
+    const titles = Array.prototype.map.call(el.querySelectorAll('[data-t="scene"]'), (n) => n.textContent.trim() || '(cena sem título)');
+    const gaps = Array.prototype.map.call(el.querySelectorAll('[data-t="gap"]'), (n) => ({ text: (n.textContent || '').replace(/^\?+\s*/, '').trim() || '(sem descrição)', stage: n.getAttribute('data-stage') ? +n.getAttribute('data-stage') : -1 }));
+    this.setState({ words: (text.match(/\S+/g) || []).length, pages: Math.max(1, Math.round(el.scrollHeight / 940)), sceneTitles: titles, gaps });
+  }
+
+  insertGap() {
+    const el = this.ed();
+    if (!el) return;
+    el.focus();
+    const b = this.block();
+    const n = document.createElement('div');
+    this.style(n, 'gap');
+    n.textContent = '??? ';
+    if (b && b.parentNode) b.parentNode.insertBefore(n, b.nextSibling); else el.appendChild(n);
+    this.caretEnd(n);
+    this.onInput();
+  }
+
+  gapNodes() { const el = this.ed(); return el ? Array.prototype.slice.call(el.querySelectorAll('[data-t="gap"]')) : []; }
+
+  jumpGap(i) {
+    const n = this.gapNodes()[i];
+    if (!n) return;
+    const box = n.closest('div[style*="overflow-y"]');
+    if (box) box.scrollTop += n.getBoundingClientRect().top - box.getBoundingClientRect().top - 60;
+    n.animate && n.animate([{ background: '#ffd84a' }, { background: '#fff3b8' }], { duration: 900 });
+    this.caretEnd(n);
+  }
+
+  nextGap() {
+    const nodes = this.gapNodes();
+    if (!nodes.length) return;
+    const cur = this.block();
+    const i = nodes.indexOf(cur);
+    this.jumpGap((i + 1) % nodes.length);
+  }
+
+  cycleGapStage(i) {
+    const n = this.gapNodes()[i];
+    if (!n) return;
+    const s = n.getAttribute('data-stage') ? +n.getAttribute('data-stage') : -1;
+    const next = s >= 11 ? -1 : s + 1;
+    if (next < 0) n.removeAttribute('data-stage'); else n.setAttribute('data-stage', String(next));
+    this.persist();
+    this.refresh();
+  }
+
+  docHtml(d) {
+    let h = null;
+    try { h = window.localStorage.getItem('enredo-doc-' + d.id); } catch (e) { h = null; }
+    return h || d.seed || '';
+  }
+
+  serieGaps(serieId) {
+    const out = [];
+    this.state.docs.forEach((d) => {
+      const e = epOf(d.ep);
+      if (!e || e.serie !== serieId) return;
+      parseGaps(this.docHtml(d)).forEach((g) => out.push(Object.assign({ doc: d, ep: e }, g)));
+    });
+    return out;
+  }
+
+  persist() {
+    const el = this.ed();
+    if (!el) return;
+    try { window.localStorage.setItem(this.key(), el.innerHTML); } catch (e) {}
+    this.setState({ saved: 'salvo agora' });
+  }
+
+  onInput = () => {
+    this.setState({ saved: 'digitando…' });
+    clearTimeout(this.saveT);
+    this.saveT = setTimeout(() => { this.persist(); this.refresh(); }, 600);
+  };
+
+  block() {
+    const sel = window.getSelection();
+    const el = this.ed();
+    if (!sel || !sel.anchorNode || !el) return null;
+    let n = sel.anchorNode;
+    while (n && n.parentNode !== el) n = n.parentNode;
+    return n && n.nodeType === 1 ? n : null;
+  }
+
+  style(node, t) { node.setAttribute('data-t', t); node.setAttribute('style', BASE + STYLES[t]); }
+
+  caretEnd(node) {
+    const r = document.createRange();
+    r.selectNodeContents(node);
+    r.collapse(false);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  }
+
+  apply(t, prefix) {
+    const el = this.ed();
+    if (!el) return;
+    el.focus();
+    let b = this.block();
+    if (!b) { b = document.createElement('div'); el.appendChild(b); }
+    this.style(b, t);
+    if (prefix && !b.textContent.trim()) b.textContent = prefix;
+    this.caretEnd(b);
+    this.onInput();
+  }
+
+  openLinkPick = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const sel = window.getSelection();
+    const el = this.ed();
+    this.savedRange = sel && sel.rangeCount && el && el.contains(sel.anchorNode) ? sel.getRangeAt(0).cloneRange() : null;
+    this.setState({ linkPick: true, linkQuery: '', linkPop: null });
+  };
+
+  insertLink(t) {
+    const el = this.ed();
+    if (!el) return;
+    const span = document.createElement('span');
+    span.setAttribute('contenteditable', 'false');
+    span.setAttribute('data-link', encodeURIComponent(JSON.stringify(t)));
+    span.setAttribute('style', LINK_STYLE);
+    span.textContent = '↗ ' + t.label;
+    let r = this.savedRange;
+    if (!r) { r = document.createRange(); r.selectNodeContents(el.lastElementChild || el); r.collapse(false); }
+    r.deleteContents();
+    r.insertNode(span);
+    const sp = document.createTextNode('\u00a0');
+    span.parentNode.insertBefore(sp, span.nextSibling);
+    const s = window.getSelection();
+    const r2 = document.createRange();
+    r2.setStartAfter(sp); r2.collapse(true);
+    s.removeAllRanges(); s.addRange(r2);
+    this.setState({ linkPick: false });
+    this.onInput();
+  }
+
+  onEditorClick = (e) => {
+    const c = e.target && e.target.closest ? e.target.closest('[data-link]') : null;
+    if (!c) { if (this.state.linkPop) this.setState({ linkPop: null }); return; }
+    e.preventDefault();
+    let t = null;
+    try { t = JSON.parse(decodeURIComponent(c.getAttribute('data-link'))); } catch (err) { t = null; }
+    if (!t) return;
+    const r = c.getBoundingClientRect();
+    this.popNode = c;
+    this.setState({ linkPop: { t, x: Math.min(r.left, window.innerWidth - 320), y: r.bottom + 8 } });
+  };
+
+  keyScope(k) { return k.indexOf('ep:') === 0 ? { planScope: 'episode', episodeId: k.slice(3) } : { planScope: 'serie', serieId: k }; }
+
+  followLink(t) {
+    this.persist();
+    const box = document.querySelector('[data-page-scroll]');
+    this.setState({ returnTo: { docId: this.state.docId, scroll: box ? box.scrollTop : 0, label: this.doc().title }, linkPop: null });
+    if (t.type === 'note') {
+      const w = this.wallFor(t.k);
+      const n = w.notes.find((x) => x.id === t.id);
+      this.set(Object.assign({ view: 'plan', boardTab: 'postits', wallFull: true, flashNote: t.id }, this.keyScope(t.k)));
+      if (n) this.setPlanFor(t.k, { wall: Object.assign({}, w, { vx: window.innerWidth / 2 - (n.x + (n.w || 180) / 2) * w.scale, vy: window.innerHeight / 2 - 50 - (n.y + (n.h || 150) / 2) * w.scale }) });
+      clearTimeout(this.flashT);
+      this.flashT = setTimeout(() => this.setState({ flashNote: null }), 2400);
+    } else if (t.type === 'stage') this.set({ view: 'plan', planScope: 'serie', serieId: t.s, boardTab: 'jornada', jSel: t.i, wallFull: false });
+    else if (t.type === 'beat') this.set(Object.assign({ view: 'plan', boardTab: 'atos', aSel: t.i, wallFull: false }, this.keyScope(t.k)));
+    else if (t.type === 'episode') this.set({ view: 'episode', episodeId: t.id, wallFull: false });
+    else if (t.type === 'idea') this.set({ view: 'ideation', serieId: t.s, wallFull: false });
+  }
+
+  goBack = () => {
+    const r = this.state.returnTo;
+    if (!r) return;
+    this.restoreScroll = r.scroll;
+    this.set({ view: 'writing', docId: r.docId, returnTo: null, wallFull: false });
+  };
+
+  onKeyDown = (e) => {
+    const b = this.block();
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { this.openLinkPick(e); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); this.setState((s) => ({ panel: s.panel === false })); return; }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'j' || e.key === 'J')) {
+      e.preventDefault();
+      if (e.shiftKey) this.nextGap(); else this.insertGap();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key >= '1' && e.key <= '7') {
+      const map = { 1: ['scene', 'INT. '], 2: ['scene', 'EXT. '], 3: ['action'], 4: ['character'], 5: ['paren', '('], 6: ['dialog'], 7: ['transition', 'CORTA PARA:'] };
+      const m = map[e.key];
+      if (m) { e.preventDefault(); this.apply(m[0], m[1]); }
+      return;
+    }
+    if (e.key === 'Tab' && b) {
+      e.preventDefault();
+      const i = CYCLE.indexOf(b.getAttribute('data-t') || 'action');
+      this.apply(CYCLE[(i + (e.shiftKey ? CYCLE.length - 1 : 1)) % CYCLE.length]);
+      return;
+    }
+    if (e.key === 'Enter' && !e.shiftKey && b) {
+      e.preventDefault();
+      const n = document.createElement('div');
+      this.style(n, NEXT[b.getAttribute('data-t') || 'action'] || 'action');
+      n.appendChild(document.createElement('br'));
+      b.parentNode.insertBefore(n, b.nextSibling);
+      this.caretEnd(n);
+      this.onInput();
+    }
+  };
+
+  mark(cmd) {
+    return (e) => {
+      e.preventDefault();
+      const el = this.ed();
+      if (el) el.focus();
+      document.execCommand(cmd, false, null);
+      this.onInput();
+    };
+  }
+
+  jumpScene(i) {
+    return () => {
+      const el = this.ed();
+      const n = el && el.querySelectorAll('[data-t="scene"]')[i];
+      if (!n) return;
+      const box = el.closest('div[style*="overflow-y"]');
+      if (box) box.scrollTop += n.getBoundingClientRect().top - box.getBoundingClientRect().top - 40;
+      this.caretEnd(n);
+    };
+  }
+
+  plain(fountain) {
+    const el = this.ed();
+    if (!el) return '';
+    const pad = (n, s) => new Array(n + 1).join(' ') + s;
+    return Array.prototype.map.call(el.children, (n) => {
+      const t = n.getAttribute('data-t') || 'action';
+      const s = (n.textContent || '').trim();
+      if (!s) return '';
+      if (t === 'scene') return '\n' + s.toUpperCase() + '\n';
+      if (t === 'character') return '\n' + (fountain ? s.toUpperCase() : pad(22, s.toUpperCase()));
+      if (t === 'paren') return fountain ? s : pad(16, s);
+      if (t === 'dialog') return fountain ? s : pad(10, s);
+      if (t === 'transition') return '\n' + (fountain ? '> ' + s.toUpperCase() : pad(50, s.toUpperCase())) + '\n';
+      if (t === 'note') return fountain ? s : '';
+      return '\n' + s + '\n';
+    }).filter(Boolean).join('\n');
+  }
+
+  download(name, body, mime) {
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(new Blob([body], { type: mime }));
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    this.setState({ saveOpen: false });
+  }
+
+  saveAs(kind) {
+    return () => {
+      const d = this.doc();
+      const safe = d.title.replace(/[^\wÀ-ÿ -]/g, '').trim();
+      if (kind === 'txt') return this.download(safe + '.txt', this.plain(false), 'text/plain;charset=utf-8');
+      if (kind === 'fountain') return this.download(safe + '.fountain', 'Title: ' + d.title + '\n\n' + this.plain(true), 'text/plain;charset=utf-8');
+      const el = this.ed();
+      return this.download(safe + '.html', '<!doctype html><meta charset="utf-8"><title>' + d.title + '</title><body style="background:#fffdf7;padding:60px">' + (el ? el.innerHTML : '') + '</body>', 'text/html;charset=utf-8');
+    };
+  }
+
+  openDoc(id) {
+    return () => {
+      const d = this.state.docs.find((x) => x.id === id);
+      const e = d && epOf(d.ep);
+      this.set({ view: 'writing', docId: id, episodeId: e ? e.id : this.state.episodeId, serieId: e ? e.serie : this.state.serieId, phaseId: d ? d.phase : this.state.phaseId });
+    };
+  }
+
+  addEpisode(serieId, title, logline, opts) {
+    const o = opts || {};
+    const id = 'e' + Date.now();
+    const n = this.state.episodes.filter((e) => e.serie === serieId).length + 1;
+    const ep = {
+      id, serie: serieId, num: p2(n),
+      title: title || 'Episódio sem título',
+      logline: logline || 'Sem logline ainda.',
+      phase: 'brainstorm', status: o.status || 'idea', arc: o.arc || 'a1', func: o.func || 'Aprofunda',
+    };
+    ALL_EPISODES = ALL_EPISODES.concat([ep]);
+    this.setState((s) => ({
+      episodes: s.episodes.concat([ep]),
+      view: o.stay ? s.view : 'episode',
+      episodeId: id, serieId, linkFor: null, saveOpen: false,
+    }));
+  }
+
+  patchEp(id, patch) {
+    ALL_EPISODES = ALL_EPISODES.map((e) => (e.id === id ? Object.assign({}, e, patch) : e));
+    this.setState((s) => ({ episodes: s.episodes.map((e) => (e.id === id ? Object.assign({}, e, patch) : e)) }));
+  }
+
+  scopeKey() { return this.state.planScope === 'episode' ? 'ep:' + this.state.episodeId : this.state.serieId; }
+  planFor(k) { return this.state.plans[k] || (k.indexOf('ep:') === 0 ? { premissa: '', pergunta: '' } : { premissa: '', pergunta: '', formato: 'Série · 30 min', previstos: 6 }); }
+  plan() { return this.planFor(this.scopeKey()); }
+  setPlanFor(k, patch) { this.setState((s) => ({ plans: Object.assign({}, s.plans, { [k]: Object.assign({}, s.plans[k] || {}, patch) }) })); }
+  setPlan(patch) { this.setPlanFor(this.scopeKey(), patch); }
+  setEsc(a) { this.setPlan({ escaleta: a }); }
+  escToDraft(esc) {
+    const id = 'd' + Date.now();
+    const ep = epOf(this.state.episodeId);
+    const seed = esc.map((r) => blk('scene', r.heading || 'INT. ') + blk('action', r.text || ' ')).join('') || blk('scene', 'INT. ');
+    this.setState((s) => ({
+      docs: s.docs.concat([{ id, ep: s.episodeId, phase: 'vomit', title: 'Vomit draft — da escaleta', format: 'Roteiro', meta: esc.length + ' cenas · criado da escaleta', seed }]),
+      docId: id, view: 'writing', wallFull: false,
+    }));
+  }
+
+  setPlanSub(field, key, value) {
+    const cur = this.plan()[field] || {};
+    this.setPlan({ [field]: Object.assign({}, cur, { [key]: value }) });
+  }
+
+  epPlan(id) { return this.state.epplans[id] || { question: '', anatomia: {}, cards: [] }; }
+
+  setEpPlan(id, patch) {
+    this.setState((s) => ({ epplans: Object.assign({}, s.epplans, { [id]: Object.assign({ question: '', anatomia: {}, cards: [] }, s.epplans[id] || {}, patch) }) }));
+  }
+
+  wallFor(k) {
+    const w = this.planFor(k).wall;
+    if (w) return Object.assign({ groups: [] }, w);
+    const ideas = k.indexOf('ep:') === 0 ? [] : this.state.ideas.filter((i) => i.serie === k);
+    const rows = Math.max(1, Math.ceil(ideas.length / 4));
+    return {
+      vx: 40, vy: 40, scale: 1, mode: 'mover', pen: '#a8432f', color: '#f4e08a', strokes: [],
+      groups: ideas.length ? [{ id: 'g0', x: 20, y: 20, w: 880, h: rows * 200 + 40, title: 'Ideias soltas', color: '#a8432f' }] : [],
+      notes: ideas.length
+        ? ideas.map((i, n) => ({ id: i.id, x: 40 + (n % 4) * 210, y: 50 + Math.floor(n / 4) * 200, w: 180, h: 150, color: i.bg, text: i.text }))
+        : [{ id: 'n0', x: 60, y: 60, w: 220, h: 160, color: '#f4e08a', text: 'Solte aqui tudo que vier sobre este episódio.' }],
+    };
+  }
+  wall() { return this.wallFor(this.scopeKey()); }
+
+  setWall(patch) { this.setPlan({ wall: Object.assign({}, this.wall(), patch) }); }
+
+  world(e, el) {
+    const w = this.wall();
+    const r = el.getBoundingClientRect();
+    return [(e.clientX - r.left - w.vx) / w.scale, (e.clientY - r.top - w.vy) / w.scale];
+  }
+
+  onWallDown = (e) => {
+    const w = this.wall();
+    const el = e.currentTarget;
+    if (w.mode === 'caneta') {
+      const p = this.world(e, el);
+      this.stroke = { pts: [p], color: w.pen };
+      this.setState({ tmp: this.stroke });
+    } else if (w.mode === 'postit') {
+      const p = this.world(e, el);
+      this.setWall({ notes: w.notes.concat([{ id: 'n' + Date.now(), x: p[0] - 90, y: p[1] - 70, w: 180, h: 150, color: w.color, text: '' }]), mode: 'mover' });
+      return;
+    } else if (w.mode === 'grupo') {
+      const p = this.world(e, el);
+      this.gDraw = { x0: p[0], y0: p[1], x1: p[0], y1: p[1] };
+      this.setState({ tmpGroup: Object.assign({}, this.gDraw) });
+    } else {
+      this.pan = { x: e.clientX, y: e.clientY, vx: w.vx, vy: w.vy };
+    }
+    el.setPointerCapture && el.setPointerCapture(e.pointerId);
+  };
+
+  onWallMove = (e) => {
+    if (this.stroke) {
+      this.stroke.pts.push(this.world(e, e.currentTarget));
+      this.setState({ tmp: Object.assign({}, this.stroke) });
+    } else if (this.pan) {
+      this.setWall({ vx: this.pan.vx + (e.clientX - this.pan.x), vy: this.pan.vy + (e.clientY - this.pan.y) });
+    } else if (this.gDraw) {
+      const p = this.world(e, e.currentTarget);
+      this.gDraw.x1 = p[0]; this.gDraw.y1 = p[1];
+      this.setState({ tmpGroup: Object.assign({}, this.gDraw) });
+    } else if (this.drag) {
+      const p = this.world(e, e.currentTarget);
+      const d = this.drag;
+      const w = this.wall();
+      if (d.kind === 'note') this.setWall({ notes: w.notes.map((n) => (n.id === d.id ? Object.assign({}, n, { x: p[0] - d.dx, y: p[1] - d.dy }) : n)) });
+      else if (d.kind === 'rnote') this.setWall({ notes: w.notes.map((n) => (n.id === d.id ? Object.assign({}, n, { w: Math.max(120, p[0] - n.x), h: Math.max(90, p[1] - n.y) }) : n)) });
+      else if (d.kind === 'group') {
+        const dx = p[0] - d.px, dy = p[1] - d.py;
+        this.setWall({
+          groups: w.groups.map((g) => (g.id === d.id ? Object.assign({}, g, { x: d.gx + dx, y: d.gy + dy }) : g)),
+          notes: w.notes.map((n) => (d.inside[n.id] ? Object.assign({}, n, { x: d.inside[n.id][0] + dx, y: d.inside[n.id][1] + dy }) : n)),
+        });
+      } else if (d.kind === 'rgroup') this.setWall({ groups: w.groups.map((g) => (g.id === d.id ? Object.assign({}, g, { w: Math.max(160, p[0] - g.x), h: Math.max(120, p[1] - g.y) }) : g)) });
+    }
+  };
+
+  onWallUp = () => {
+    if (this.stroke && this.stroke.pts.length > 1) {
+      this.setWall({ strokes: this.wall().strokes.concat([{ d: this.path(this.stroke.pts), color: this.stroke.color }]) });
+    }
+    if (this.gDraw) {
+      const g = this.gDraw;
+      const gw = Math.abs(g.x1 - g.x0), gh = Math.abs(g.y1 - g.y0);
+      if (gw > 40 && gh > 40) {
+        const w = this.wall();
+        this.setWall({ groups: w.groups.concat([{ id: 'g' + Date.now(), x: Math.min(g.x0, g.x1), y: Math.min(g.y0, g.y1), w: gw, h: gh, title: 'Grupo', color: w.pen }]), mode: 'mover' });
+      }
+    }
+    this.stroke = null;
+    this.pan = null;
+    this.drag = null;
+    this.gDraw = null;
+    this.setState({ tmp: null, tmpGroup: null });
+  };
+
+  onWallWheel = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const w = this.wall();
+    if (e.shiftKey) { this.setWall({ vx: w.vx - (e.deltaY || e.deltaX), vy: w.vy }); return; }
+    const r = e.currentTarget.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const k = Math.exp(-e.deltaY * 0.0015);
+    const s = Math.min(2.4, Math.max(0.35, w.scale * k));
+    const wx = (mx - w.vx) / w.scale, wy = (my - w.vy) / w.scale;
+    this.setWall({ scale: s, vx: mx - wx * s, vy: my - wy * s });
+  };
+
+  bindWall() {
+    const el = document.querySelector('[data-wall]');
+    if (el === this.wallEl) return;
+    if (this.wallEl) this.wallEl.removeEventListener('wheel', this.onWallWheel);
+    this.wallEl = el;
+    if (el) el.addEventListener('wheel', this.onWallWheel, { passive: false });
+  }
+
+  onEsc = (e) => { if (e.key === 'Escape' && this.state.wallFull) this.setState({ wallFull: false }); };
+
+  path(pts) { return pts.map((p, i) => (i ? 'L' : 'M') + Math.round(p[0]) + ' ' + Math.round(p[1])).join(' '); }
+
+  stcCards() { return this.plan().stc || []; }
+
+  setStc(cards) { this.setPlan({ stc: cards }); }
+
+  addBeat(id) {
+    const cur = this.epPlan(id).cards || [];
+    this.setEpPlan(id, { cards: cur.concat([{ id: 'c' + Date.now(), title: 'Cena ' + p2(cur.length + 1), text: '' }]) });
+  }
+
+  linkTargets(s, ep) {
+    const out = [];
+    this.wallFor(s.id).notes.forEach((n) => out.push({ group: 'Post-its da história', color: n.color, label: 'post-it: ' + short(n.text), t: { type: 'note', k: s.id, id: n.id, label: 'post-it: ' + short(n.text) } }));
+    if (ep) this.wallFor('ep:' + ep.id).notes.forEach((n) => out.push({ group: 'Post-its do episódio', color: n.color, label: 'post-it: ' + short(n.text), t: { type: 'note', k: 'ep:' + ep.id, id: n.id, label: 'post-it: ' + short(n.text) } }));
+    JOURNEY.forEach((l, i) => out.push({ group: 'Jornada do herói', color: '#1e1b18', label: p2(i + 1) + ' ' + l, t: { type: 'stage', s: s.id, i, label: 'jornada ' + p2(i + 1) + ' ' + l } }));
+    ATOS.forEach((b, i) => out.push({ group: 'Linha do tempo · 3 atos', color: '#a8432f', label: b.label, t: { type: 'beat', k: ep ? 'ep:' + ep.id : s.id, i, label: b.label } }));
+    this.state.episodes.filter((e) => e.serie === s.id).forEach((e) => out.push({ group: 'Episódios', color: '#2c5bd1', label: 'ep. ' + e.num + ' — ' + e.title, t: { type: 'episode', id: e.id, label: 'ep. ' + e.num + ' ' + e.title } }));
+    this.state.ideas.filter((i) => i.serie === s.id).forEach((i) => out.push({ group: 'Ideias', color: i.bg, label: short(i.text), t: { type: 'idea', s: s.id, id: i.id, label: 'ideia: ' + short(i.text) } }));
+    return out;
+  }
+
+  linkPreview(t) {
+    if (t.type === 'note') { const n = this.wallFor(t.k).notes.find((x) => x.id === t.id); return n ? n.text || '(post-it vazio)' : 'Esse post-it foi apagado.'; }
+    if (t.type === 'stage') return (this.planFor(t.s).journeyNotes || {})[t.i] || 'Sem anotação nessa etapa ainda.';
+    if (t.type === 'beat') return ((this.planFor(t.k).atos || {})[t.i] || {}).note || 'Sem anotação nesse ponto ainda.';
+    if (t.type === 'episode') { const e = epOf(t.id); return e ? e.logline : ''; }
+    if (t.type === 'idea') { const i = this.state.ideas.find((x) => x.id === t.id); return i ? i.text : ''; }
+    return '';
+  }
+
+  addSerie() {
+    const id = 's' + Date.now();
+    const palette = [
+      { color: '#e8622a', glow: 'rgba(255,255,255,.4)', chipBg: '#e8622a', chipFg: '#2c1005' },
+      { color: '#d62e7b', glow: 'rgba(255,209,102,.45)', chipBg: '#d62e7b', chipFg: '#fff0f7' },
+      { color: '#1e1b18', glow: 'rgba(244,233,216,.3)', chipBg: '#1e1b18', chipFg: '#f4e9d8' },
+    ];
+    const p = palette[this.state.series.length % palette.length];
+    this.setState((s) => ({
+      series: s.series.concat([Object.assign({ id, title: 'História sem título', kind: 'Série', meta: '0 episódios · criada agora' }, p)]),
+      view: 'serie', serieId: id, linkFor: null, saveOpen: false,
+    }));
+  }
+
+  linkOptions(d) {
+    const out = [];
+    this.state.episodes.forEach((e) => {
+      const s = this.state.series.find((x) => x.id === e.serie);
+      PHASES.forEach((p) => {
+        out.push({
+          label: s.title + ' · ep. ' + e.num + ' · ' + p.title,
+          color: p.color,
+          bg: d.ep === e.id && d.phase === p.id ? 'rgba(58,35,24,.12)' : 'transparent',
+          pick: () => this.setState((st) => ({
+            docs: st.docs.map((x) => (x.id === d.id ? Object.assign({}, x, { ep: e.id, phase: p.id }) : x)),
+            linkFor: null,
+          })),
+        });
+      });
+    });
+    return out;
+  }
+
+  docCard(d) {
+    const e = epOf(d.ep);
+    const s = e && this.state.series.find((x) => x.id === e.serie);
+    const p = phaseOf(d.phase);
+    return Object.assign({}, d, {
+      dot: p.color,
+      linkLabel: s && e ? s.title + ' · ep. ' + e.num + ' · ' + p.title : 'sem vínculo',
+      linkBg: p.color,
+      linkFg: p.ink,
+      linkOpen: this.state.linkFor === d.id,
+      toggleLink: () => this.setState((st) => ({ linkFor: st.linkFor === d.id ? null : d.id })),
+      open: this.openDoc(d.id),
+      options: this.linkOptions(d),
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const v = st.view;
+    const serie = st.series.find((x) => x.id === st.serieId) || st.series[0];
+    const episode = epOf(st.episodeId) || st.episodes[0];
+    const phase = phaseOf(st.phaseId);
+    const doc = this.doc();
+    const docEp = doc && epOf(doc.ep);
+    const docSerie = docEp && st.series.find((x) => x.id === docEp.serie);
+    const docPhase = doc && phaseOf(doc.phase);
+    const left = Math.max(0, UNLOCK_AT - st.now);
+    const days = Math.floor(left / 864e5);
+    const on = (n) => (v === n ? '#f2e3cf' : 'transparent');
+    const ink = (n) => (v === n ? '#3a2318' : '#e8d5bd');
+
+    if (v === 'writing' && this.mounted !== doc.id) {
+      this.mounted = doc.id;
+      clearTimeout(this.mountT);
+      this.mountT = setTimeout(() => this.mountDoc(), 0);
+    } else if (v !== 'writing' && this.mounted) this.mounted = null;
+
+    const serieEps = st.episodes.filter((e) => e.serie === serie.id);
+    const serieIdeas = st.ideas.filter((i) => i.serie === serie.id);
+    const epDocs = st.docs.filter((d) => d.ep === episode.id);
+    const shown = st.filter === 'Todas'
+      ? serieIdeas
+      : st.filter === 'Destacadas' ? serieIdeas.filter((i) => i.pinned) : serieIdeas.filter((i) => i.kind === st.filter);
+    const sorted = shown.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+    const isEpScope = st.planScope === 'episode';
+    const scopeK = isEpScope ? 'ep:' + episode.id : serie.id;
+    const plan = Object.assign({ premissa: '', pergunta: '', formato: 'Série · 30 min', previstos: serieEps.length }, st.plans[scopeK] || {});
+    const gap = Math.max(0, plan.previstos - serieEps.filter((e) => e.status !== 'cut').length);
+    const boards = plan.boards || (isEpScope ? ['anatomia', 'escaleta', 'atos', 'postits', 'fichas'] : ['anatomia', 'jornada', 'atos', 'fichas', 'postits', 'timeline']);
+    const tab = boards.indexOf(st.boardTab) >= 0 ? st.boardTab : boards[0];
+    const esc = plan.escaleta || (isEpScope && episode.id === 'e1' ? ESC_SEED : []);
+    const aSel = st.aSel == null ? 0 : st.aSel;
+    const aNotes = plan.atos || {};
+    const wall = this.wall();
+    const stc = (plan.stc || (!isEpScope && serie.id === 's1' ? STC_SEED : [])).map((c, i) => Object.assign({ idx: i }, c));
+    const jSel = st.jSel == null ? 0 : st.jSel;
+    const jNotes = plan.journeyNotes || {};
+    const sGaps = this.serieGaps(serie.id).filter((g) => !isEpScope || g.ep.id === episode.id);
+    const epPlan = st.epplans[episode.id] || { question: '', anatomia: {}, cards: [] };
+
+    return {
+      isPlan: v === 'plan',
+      goPlan: () => this.set({ view: 'plan', planScope: 'serie', wallFull: false }),
+      isEpScope, isSerieScope: !isEpScope,
+      planTitle: isEpScope ? 'Planejamento do episódio' : 'Planejamento da história',
+      planSub: isEpScope ? 'ep. ' + episode.num + ' — ' + episode.title + ' · o desenho do episódio antes do texto.' : 'O desenho da série antes dos textos: do que ela trata, em quantos episódios e o que já é canônico.',
+      planBackLabel: isEpScope ? 'ep. ' + episode.num + ' — ' + episode.title : serie.title,
+      planBack: () => this.set({ view: isEpScope ? 'episode' : 'serie', wallFull: false }),
+      goEpPlan: () => this.set({ view: 'plan', planScope: 'episode', boardTab: 'anatomia', wallFull: false }),
+      goEpBrainstorm: () => this.set({ view: 'plan', planScope: 'episode', boardTab: 'postits', wallFull: true }),
+      epPlanPergunta: (st.plans['ep:' + episode.id] || {}).pergunta || '',
+      onEpPlanPergunta: (e) => this.setPlanFor('ep:' + episode.id, { pergunta: e.target.value }),
+      epNoteCount: this.wallFor('ep:' + episode.id).notes.length,
+      epEscCount: ((st.plans['ep:' + episode.id] || {}).escaleta || (episode.id === 'e1' ? ESC_SEED : [])).length,
+
+      tabAtos: tab === 'atos', tabEscaleta: tab === 'escaleta',
+      escRows: esc.map((r, i) => ({
+        num: p2(i + 1), heading: r.heading, text: r.text,
+        onHeading: (e) => this.setEsc(esc.map((x, j) => (j === i ? Object.assign({}, x, { heading: e.target.value }) : x))),
+        onText: (e) => this.setEsc(esc.map((x, j) => (j === i ? Object.assign({}, x, { text: e.target.value }) : x))),
+        up: () => { if (i > 0) { const a = esc.slice(); const t = a[i - 1]; a[i - 1] = a[i]; a[i] = t; this.setEsc(a); } },
+        down: () => { if (i < esc.length - 1) { const a = esc.slice(); const t = a[i + 1]; a[i + 1] = a[i]; a[i] = t; this.setEsc(a); } },
+        remove: () => this.setEsc(esc.filter((x, j) => j !== i)),
+      })),
+      addEsc: () => this.setEsc(esc.concat([{ heading: 'INT. ', text: '' }])),
+      escToDraft: () => this.escToDraft(esc),
+      escCount: esc.length + (esc.length === 1 ? ' cena' : ' cenas'),
+
+      aBeats: ATOS.map((b, i) => {
+        const on = i === aSel;
+        const has = !!((aNotes[i] || {}).note || '').trim() || !!(aNotes[i] || {}).ep;
+        const TICK = [40, 72, 40, 60, 40, 72, 90, 40, 90, 40, 120, 60, 90, 40];
+        const tickTop = b.y - TICK[i];
+        const leftOf = i === 3 || i === 10 || i === 13;
+        return {
+          x: b.x, y: b.y, tickTop, labelY: tickTop - 7, label: b.label,
+          anchor: i === 0 || i === 11 ? 'left' : leftOf ? 'right' : 'center',
+          tx: i === 0 || i === 11 ? '0%' : leftOf ? '-100%' : '-50%',
+          lx: (b.x / 10 - (i === 3 || i === 10 ? 0.6 : 0)) + '%', ly: ((tickTop - 4) / 4.3) + '%',
+          shape: b.star ? burst(b.x, b.y, 19, 9, 8) : burst(b.x, b.y, 8, 8, 6),
+          fill: on ? '#a8432f' : has ? '#2a1b12' : '#fffdf7',
+          ink: on ? '#a8432f' : '#2a1b12', weight: on ? '700' : '400',
+          pick: () => this.setState({ aSel: i }),
+        };
+      }),
+      aSelNum: p2(aSel + 1), aSelLabel: ATOS[aSel].label, aSelAct: ACT_NAMES[ATOS[aSel].act],
+      aSelNote: (aNotes[aSel] || {}).note || '',
+      onANote: (e) => this.setPlanSub('atos', aSel, Object.assign({}, aNotes[aSel] || {}, { note: e.target.value })),
+      aPrev: () => this.setState({ aSel: (aSel + ATOS.length - 1) % ATOS.length }),
+      aNext: () => this.setState({ aSel: (aSel + 1) % ATOS.length }),
+      aEpLabel: (function (id) { const e = id && epOf(id); return e ? 'ep. ' + e.num + ' — ' + e.title : 'ligar a um episódio'; })((aNotes[aSel] || {}).ep),
+      cycleAEp: () => {
+        const ids = [null].concat(serieEps.map((e) => e.id));
+        const cur = (aNotes[aSel] || {}).ep || null;
+        const nx = ids[(ids.indexOf(cur) + 1) % ids.length];
+        this.setPlanSub('atos', aSel, Object.assign({}, aNotes[aSel] || {}, { ep: nx }));
+      },
+      aFilled: ATOS.filter((x, i) => ((aNotes[i] || {}).note || '').trim()).length + ' de ' + ATOS.length + ' pontos preenchidos',
+      planPremissa: plan.premissa,
+      planPergunta: plan.pergunta,
+      onPremissa: (e) => this.setPlan({ premissa: e.target.value }),
+      onPergunta: (e) => this.setPlan({ pergunta: e.target.value }),
+      planFormats: FORMATS.map((f) => ({
+        label: f,
+        bg: plan.formato === f ? '#2a1b12' : 'transparent',
+        fg: plan.formato === f ? '#f7ecdc' : '#3a2318',
+        bc: plan.formato === f ? '#2a1b12' : 'rgba(58,35,24,.22)',
+        pick: () => this.setPlan({ formato: f }),
+      })),
+      planPrevistos: (st.plans[serie.id] || {}).previstos || serieEps.length,
+      lessEp: () => this.setPlan({ previstos: Math.max(1, plan.previstos - 1) }),
+      moreEp: () => this.setPlan({ previstos: plan.previstos + 1 }),
+      planCounts: STATUSES.map((s) => ({
+        label: s.label, bg: s.bg, fg: s.fg,
+        count: serieEps.filter((e) => e.status === s.id).length,
+      })),
+      planGapLabel: gap > 0 ? gap + (gap === 1 ? ' episódio previsto ainda sem lugar na grade' : ' episódios previstos ainda sem lugar na grade') : 'grade completa',
+      arcs: ARCS.map((a) => ({
+        ...a,
+        count: serieEps.filter((e) => e.arc === a.id).length,
+        eps: serieEps.filter((e) => e.arc === a.id).map((e) => ({ num: e.num, title: e.title, color: statusOf(e.status).bg })),
+      })),
+      planRows: serieEps.map((e) => {
+        const stt = statusOf(e.status);
+        const p = phaseOf(e.phase);
+        const arc = ARCS.find((a) => a.id === e.arc) || ARCS[0];
+        return {
+          ...e,
+          statusLabel: stt.label, statusBg: stt.bg, statusFg: stt.fg,
+          dim: e.status === 'cut' ? '.45' : '1',
+          phaseLabel: p.title, phaseColor: p.color, phaseInk: p.ink,
+          arcTitle: arc.title, arcColor: arc.color,
+          docCount: (function (n) { return n === 1 ? '1 texto' : n + ' textos'; })(st.docs.filter((d) => d.ep === e.id).length),
+          cycle: () => {
+            const i = STATUSES.findIndex((x) => x.id === e.status);
+            this.patchEp(e.id, { status: STATUSES[(i + 1) % STATUSES.length].id });
+          },
+          cycleArc: () => {
+            const i = ARCS.findIndex((x) => x.id === e.arc);
+            this.patchEp(e.id, { arc: ARCS[(i + 1) % ARCS.length].id });
+          },
+          cycleFunc: () => {
+            const i = FUNCS.indexOf(e.func);
+            this.patchEp(e.id, { func: FUNCS[(i + 1) % FUNCS.length] });
+          },
+          open: () => this.set({ view: 'episode', episodeId: e.id }),
+        };
+      }),
+      addPlanned: () => this.addEpisode(serie.id, 'Episódio previsto', 'Só o lugar na grade por enquanto.', { status: 'idea', stay: true }),
+      statusLegend: STATUSES,
+
+      planPrincipio: plan.principio || '',
+      onPrincipio: (e) => this.setPlan({ principio: e.target.value }),
+      boardTabs: boards.map((id) => {
+        const b = BOARDS.find((x) => x.id === id) || BOARDS[0];
+        const active = tab === id;
+        return {
+          label: b.label,
+          bg: active ? '#2a1b12' : 'rgba(247,236,220,.6)',
+          fg: active ? '#f7ecdc' : '#3a2318',
+          bc: active ? '#2a1b12' : 'rgba(58,35,24,.2)',
+          pick: () => this.setState({ boardTab: id }),
+        };
+      }),
+      addBoards: BOARDS.filter((b) => boards.indexOf(b.id) < 0).map((b) => ({
+        label: b.label, desc: b.desc,
+        add: () => { this.setPlan({ boards: boards.concat([b.id]) }); this.setState({ boardTab: b.id }); },
+      })),
+      hasAddBoards: BOARDS.filter((b) => boards.indexOf(b.id) < 0).length > 0,
+      addBoardOpen: !!st.addBoardOpen,
+      toggleAddBoard: () => this.setState((s) => ({ addBoardOpen: !s.addBoardOpen })),
+
+      wallPos: st.wallFull ? 'fixed' : 'relative', wallInset: st.wallFull ? '0' : 'auto', wallZ: st.wallFull ? '300' : 'auto',
+      wallPad: st.wallFull ? '14px' : '0', wallOuterBg: st.wallFull ? '#a8734f' : 'transparent',
+      wallH: st.wallFull ? 'auto' : '620px',
+      wallFlex: st.wallFull ? '1 1 0' : '0 0 auto',
+      wallOuterH: st.wallFull ? '100vh' : 'auto',
+      wallFullLabel: st.wallFull ? 'Sair da tela cheia' : 'Tela cheia',
+      toggleWallFull: () => this.setState((s) => ({ wallFull: !s.wallFull })),
+      wallDown: this.onWallDown, wallMove: this.onWallMove, wallUp: this.onWallUp, wallWheel: this.onWallWheel,
+      wallTransform: 'translate(' + wall.vx + 'px,' + wall.vy + 'px) scale(' + wall.scale + ')',
+      wallGrid: (26 * wall.scale) + 'px ' + (26 * wall.scale) + 'px',
+      wallGridPos: wall.vx + 'px ' + wall.vy + 'px',
+      wallCursor: wall.mode === 'caneta' ? 'crosshair' : wall.mode === 'postit' ? 'copy' : 'grab',
+      wallZoom: Math.round(wall.scale * 100) + '%',
+      wallStrokes: wall.strokes,
+      wallTmp: st.tmp ? this.path(st.tmp.pts) : '',
+      wallTmpColor: st.tmp ? st.tmp.color : '#000',
+      wallGroups: wall.groups.map((g) => {
+        const inside = wall.notes.filter((n) => { const cx = n.x + (n.w || 180) / 2, cy = n.y + (n.h || 150) / 2; return cx > g.x && cx < g.x + g.w && cy > g.y && cy < g.y + g.h; });
+        return {
+          title: g.title, color: g.color, tint: g.color + '12',
+          left: g.x + 'px', top: g.y + 'px', w: g.w + 'px', h: g.h + 'px',
+          titleW: Math.max(50, (g.title || '').length * 7.5) + 'px',
+          pe: wall.mode === 'mover' ? 'auto' : 'none',
+          count: inside.length,
+          grab: (e) => {
+            e.stopPropagation();
+            const p = this.world(e, e.currentTarget.closest('[data-wall]'));
+            const ins = {};
+            inside.forEach((n) => { ins[n.id] = [n.x, n.y]; });
+            this.drag = { kind: 'group', id: g.id, px: p[0], py: p[1], gx: g.x, gy: g.y, inside: ins };
+          },
+          rgrab: (e) => { e.stopPropagation(); this.drag = { kind: 'rgroup', id: g.id }; },
+          stop: (e) => e.stopPropagation(),
+          onTitle: (e) => this.setWall({ groups: this.wall().groups.map((x) => (x.id === g.id ? Object.assign({}, x, { title: e.target.value }) : x)) }),
+          remove: (e) => { e.stopPropagation(); this.setWall({ groups: this.wall().groups.filter((x) => x.id !== g.id) }); },
+        };
+      }),
+      hasTmpGroup: !!st.tmpGroup,
+      tmpGL: st.tmpGroup ? Math.min(st.tmpGroup.x0, st.tmpGroup.x1) + 'px' : '0px',
+      tmpGT: st.tmpGroup ? Math.min(st.tmpGroup.y0, st.tmpGroup.y1) + 'px' : '0px',
+      tmpGW: st.tmpGroup ? Math.abs(st.tmpGroup.x1 - st.tmpGroup.x0) + 'px' : '0px',
+      tmpGH: st.tmpGroup ? Math.abs(st.tmpGroup.y1 - st.tmpGroup.y0) + 'px' : '0px',
+      wallTools: [['mover', 'Mover'], ['caneta', 'Caneta'], ['postit', 'Post-it'], ['grupo', 'Grupo']].map((t) => ({
+        label: t[1],
+        bg: wall.mode === t[0] ? '#2a1b12' : 'transparent',
+        fg: wall.mode === t[0] ? '#f7ecdc' : '#3a2318',
+        pick: () => this.setWall({ mode: t[0] }),
+      })),
+      wallNoteColors: ['#f4e08a', '#f4b7c0', '#b9e0a5', '#a8d0e6', '#c9b6e4', '#f2b26b'].map((c) => ({
+        c, ring: wall.color === c ? '0 0 0 2px #fffdf7, 0 0 0 4px #2a1b12' : 'none',
+        pick: () => this.setWall({ color: c, mode: 'postit' }),
+      })),
+      wallPens: ['#2a1b12', '#a8432f', '#2c5bd1', '#25a244'].map((c) => ({
+        c, ring: wall.pen === c && wall.mode === 'caneta' ? '0 0 0 2px #fffdf7, 0 0 0 4px #2a1b12' : 'none',
+        pick: () => this.setWall({ pen: c, mode: 'caneta' }),
+      })),
+      wallZoomIn: () => this.setWall({ scale: Math.min(2.4, wall.scale * 1.15) }),
+      wallZoomOut: () => this.setWall({ scale: Math.max(0.35, wall.scale / 1.15) }),
+      wallReset: () => this.setWall({ vx: 40, vy: 40, scale: 1 }),
+      wallClear: () => this.setWall({ strokes: [] }),
+      wallNotes: wall.notes.map((n) => ({
+        text: n.text, color: n.color,
+        left: n.x + 'px', top: n.y + 'px', w: (n.w || 180) + 'px', h: (n.h || 150) + 'px',
+        pe: wall.mode === 'mover' ? 'auto' : 'none',
+        ring: st.flashNote === n.id ? '0 0 0 5px #2c5bd1, 0 18px 30px -12px rgba(35,18,9,.7)' : '0 12px 22px -12px rgba(35,18,9,.7)',
+        grab: (e) => {
+          e.stopPropagation();
+          const vp = e.currentTarget.closest('[data-wall]');
+          const p = this.world(e, vp);
+          this.drag = { kind: 'note', id: n.id, dx: p[0] - n.x, dy: p[1] - n.y };
+        },
+        rgrab: (e) => { e.stopPropagation(); this.drag = { kind: 'rnote', id: n.id }; },
+        stop: (e) => e.stopPropagation(),
+        onText: (e) => this.setWall({ notes: this.wall().notes.map((x) => (x.id === n.id ? Object.assign({}, x, { text: e.target.value }) : x)) }),
+        remove: (e) => { e.stopPropagation(); this.setWall({ notes: this.wall().notes.filter((x) => x.id !== n.id) }); },
+      })),
+
+      jNodes: JOURNEY.map((label, i) => {
+        const a = (-105 + i * 30) * Math.PI / 180;
+        const below = Math.sin(a) > 0;
+        const on = i === jSel;
+        const has = !!(jNotes[i] || '').trim();
+        const lx = 50 + Math.cos(a) * 37, ly = 50 + Math.sin(a) * 37;
+        const nGap = sGaps.filter((g) => g.stage === i).length;
+        return {
+          num: i + 1, label,
+          left: (50 + Math.cos(a) * 30) + '%', top: (50 + Math.sin(a) * 30) + '%',
+          lLeft: lx + '%', lTop: ly + '%',
+          lAlign: Math.cos(a) > 0.2 ? 'left' : Math.cos(a) < -0.2 ? 'right' : 'center',
+          lShift: Math.cos(a) > 0.2 ? '0%' : Math.cos(a) < -0.2 ? '-100%' : '-50%',
+          bg: on ? '#a8432f' : has ? (below ? '#f4e9d8' : '#2a1b12') : (below ? '#1e1b18' : '#f7ecdc'),
+          fg: on ? '#fff1e4' : has ? (below ? '#1e1b18' : '#f4e9d8') : (below ? '#f4e9d8' : '#2a1b12'),
+          bc: below ? '#f4e9d8' : '#2a1b12',
+          size: on ? '58px' : '46px',
+          gapCount: nGap, hasGap: nGap > 0,
+          empty: !has && nGap === 0,
+          pick: () => this.setState({ jSel: i }),
+        };
+      }),
+      jSelNum: p2(jSel + 1),
+      jSelLabel: JOURNEY[jSel],
+      jSelWorld: (function (a) { return Math.sin(a) > 0 ? 'Mundo especial' : 'Mundo comum'; })((-105 + jSel * 30) * Math.PI / 180),
+      jSelNote: jNotes[jSel] || '',
+      jSelGaps: sGaps.filter((g) => g.stage === jSel).map((g) => ({ text: g.text, where: 'ep. ' + g.ep.num + ' · ' + g.doc.title, open: this.openDoc(g.doc.id) })),
+      jHasSelGaps: sGaps.some((g) => g.stage === jSel),
+      jSelEmpty: !(jNotes[jSel] || '').trim() && !sGaps.some((g) => g.stage === jSel),
+      jGapTotal: sGaps.length,
+      jUnplaced: sGaps.filter((g) => g.stage < 0).length,
+      jEmptyStages: JOURNEY.filter((x, i) => !(jNotes[i] || '').trim() && !sGaps.some((g) => g.stage === i)).length,
+      gapList: (st.gaps || []).map((g, i) => ({ text: g.text, stage: g.stage >= 0 ? p2(g.stage + 1) + ' ' + JOURNEY[g.stage] : 'ligar à jornada', stageBg: g.stage >= 0 ? '#2a1b12' : 'transparent', stageFg: g.stage >= 0 ? '#f7ecdc' : '#8a5a00', jump: () => this.jumpGap(i), cycle: () => this.cycleGapStage(i) })),
+      gapCount: (st.gaps || []).length,
+      hasGaps: (st.gaps || []).length > 0,
+      nextGap: () => this.nextGap(),
+      onJNote: (e) => this.setPlanSub('journeyNotes', jSel, e.target.value),
+      jPrev: () => this.setState({ jSel: (jSel + 11) % 12 }),
+      jNext: () => this.setState({ jSel: (jSel + 1) % 12 }),
+      jFilled: Object.keys(jNotes).filter((k) => (jNotes[k] || '').trim()).length + ' de 12 etapas com anotação',
+
+      stcBeats: STC_BEATS,
+      stcRows: STC_ROWS.map((r, ri) => ({
+        title: r.title, pages: r.pages,
+        cards: stc.filter((c) => c.row === ri).map((c) => {
+          const sto = STC_STORIES.find((s) => s.id === c.story) || STC_STORIES[0];
+          const upd = (patch) => this.setStc(stc.map((x) => (x.idx === c.idx ? Object.assign({}, x, patch) : x)).map((x) => { const y = Object.assign({}, x); delete y.idx; return y; }));
+          return {
+            title: c.title, text: c.text, emo: c.emo, conflict: c.conflict, beat: c.beat || '—',
+            storyLabel: sto.label, storyColor: sto.color, storyInk: sto.ink,
+            emoColor: c.emo === '+/−' || c.emo === '−/−' ? '#a8432f' : '#25a244',
+            onTitle: (e) => upd({ title: e.target.value }),
+            onText: (e) => upd({ text: e.target.value }),
+            onConflict: (e) => upd({ conflict: e.target.value }),
+            cycleEmo: () => upd({ emo: STC_EMO[(STC_EMO.indexOf(c.emo) + 1) % STC_EMO.length] }),
+            cycleStory: () => upd({ story: STC_STORIES[(STC_STORIES.findIndex((s) => s.id === c.story) + 1) % STC_STORIES.length].id }),
+            cycleBeat: () => { const i = STC_BEATS.findIndex((b) => b.label === c.beat); upd({ beat: STC_BEATS[(i + 1) % STC_BEATS.length].label }); },
+            up: () => upd({ row: Math.max(0, c.row - 1) }),
+            down: () => upd({ row: Math.min(3, c.row + 1) }),
+            remove: () => this.setStc(stc.filter((x) => x.idx !== c.idx).map((x) => { const y = Object.assign({}, x); delete y.idx; return y; })),
+          };
+        }),
+        add: () => this.setStc(stc.map((x) => { const y = Object.assign({}, x); delete y.idx; return y; }).concat([{ row: ri, title: 'INT. ', text: '', emo: '+/−', conflict: '', story: 'A', beat: '' }])),
+      })),
+      stcCount: stc.length + ' fichas · a meta clássica é 40',
+      tabAnatomia: tab === 'anatomia', tabJornada: tab === 'jornada',
+      tabPropp: tab === 'propp', tabTimeline: tab === 'timeline',
+      tabFichas: tab === 'fichas', tabPostits: tab === 'postits',
+
+      anatomiaFields: ANATOMY.map((a) => ({
+        label: a.label, hint: a.hint,
+        value: (plan.anatomia || {})[a.key] || '',
+        onChange: (e) => this.setPlanSub('anatomia', a.key, e.target.value),
+      })),
+
+      journeyStages: JOURNEY.map((label, i) => {
+        const done = !!(plan.journey || {})[i];
+        return {
+          num: p2(i + 1), label, done,
+          bg: done ? '#25a244' : 'rgba(247,236,220,.6)',
+          fg: done ? '#0d2a12' : 'rgba(42,27,18,.75)',
+          bar: done ? '#0d2a12' : 'rgba(58,35,24,.16)',
+          toggle: () => this.setPlanSub('journey', i, !done),
+        };
+      }),
+      journeyDone: JOURNEY.filter((x, i) => (plan.journey || {})[i]).length + ' de 12 etapas com material',
+
+      proppFns: PROPP.map((label, i) => {
+        const on = !!(plan.propp || {})[i];
+        return {
+          num: p2(i + 1), label, on,
+          bg: on ? '#7b3fe4' : 'transparent',
+          fg: on ? '#fdf6e8' : '#3a2318',
+          bc: on ? '#7b3fe4' : 'rgba(58,35,24,.2)',
+          toggle: () => this.setPlanSub('propp', i, !on),
+        };
+      }),
+      proppCount: PROPP.filter((x, i) => (plan.propp || {})[i]).length + ' de 31 funções marcadas',
+
+      timelineEps: serieEps.map((e) => {
+        const t = (plan.tension || {})[e.id] || 3;
+        const stt = statusOf(e.status);
+        return {
+          num: e.num, title: e.title, value: t, height: 28 + t * 34 + 'px',
+          color: stt.bg, ink: stt.fg,
+          up: () => this.setPlanSub('tension', e.id, Math.min(5, t + 1)),
+          down: () => this.setPlanSub('tension', e.id, Math.max(1, t - 1)),
+          open: () => this.set({ view: 'episode', episodeId: e.id }),
+        };
+      }),
+
+      fichas: serieEps.map((e) => {
+        const stt = statusOf(e.status);
+        const arc = ARCS.find((a) => a.id === e.arc) || ARCS[0];
+        return {
+          num: e.num, title: e.title, logline: e.logline,
+          color: stt.bg, ink: stt.fg, arcTitle: arc.title, func: e.func,
+          onLogline: (ev) => this.patchEp(e.id, { logline: ev.target.value }),
+          open: () => this.set({ view: 'episode', episodeId: e.id }),
+        };
+      }),
+
+      postits: serieIdeas.map((i) => ({
+        text: i.text, kind: i.kind, bg: i.bg, rot: i.rot,
+        ring: i.pinned ? '0 0 0 3px #2a1b12' : 'none',
+        pin: () => this.setState((s) => ({ ideas: s.ideas.map((x) => (x.id === i.id ? { ...x, pinned: !x.pinned } : x)) })),
+      })),
+
+      epQuestion: epPlan.question || '',
+      onEpQuestion: (e) => this.setEpPlan(episode.id, { question: e.target.value }),
+      epLogline: episode.logline,
+      epAnatomia: ANATOMY.map((a) => ({
+        label: a.label,
+        value: (epPlan.anatomia || {})[a.key] || '',
+        onChange: (e) => this.setEpPlan(episode.id, { anatomia: Object.assign({}, epPlan.anatomia || {}, { [a.key]: e.target.value }) }),
+      })),
+      epCards: (epPlan.cards || []).map((c, i) => ({
+        num: p2(i + 1), title: c.title, text: c.text,
+        onText: (e) => this.setEpPlan(episode.id, { cards: (epPlan.cards || []).map((x) => (x.id === c.id ? Object.assign({}, x, { text: e.target.value }) : x)) }),
+        onTitle: (e) => this.setEpPlan(episode.id, { cards: (epPlan.cards || []).map((x) => (x.id === c.id ? Object.assign({}, x, { title: e.target.value }) : x)) }),
+        remove: () => this.setEpPlan(episode.id, { cards: (epPlan.cards || []).filter((x) => x.id !== c.id) }),
+      })),
+      addBeat: () => this.addBeat(episode.id),
+      epStatusLabel: statusOf(episode.status).label,
+      epStatusBg: statusOf(episode.status).bg,
+      epStatusFg: statusOf(episode.status).fg,
+      cycleEpStatus: () => {
+        const i = STATUSES.findIndex((x) => x.id === episode.status);
+        this.patchEp(episode.id, { status: STATUSES[(i + 1) % STATUSES.length].id });
+      },
+
+      isSeries: v === 'series', isSerie: v === 'serie', isIdeation: v === 'ideation',
+      isEpisode: v === 'episode', isPhase: v === 'phase', isDocs: v === 'docs',
+      isMaturing: v === 'maturing', isBoard: v === 'board', isWriting: v === 'writing',
+
+      navSeries: v === 'series' || v === 'serie' || v === 'ideation' || v === 'episode' || v === 'phase' ? '#f2e3cf' : 'transparent',
+      navSeriesInk: v === 'series' || v === 'serie' || v === 'ideation' || v === 'episode' || v === 'phase' ? '#3a2318' : '#e8d5bd',
+      navDocs: on('docs'), navDocsInk: ink('docs'),
+      navMaturing: on('maturing'), navMaturingInk: ink('maturing'),
+      navBoard: on('board'), navBoardInk: ink('board'),
+      goSeries: this.go('series'), goDocs: this.go('docs'), goMaturing: this.go('maturing'),
+      goBoard: this.go('board'), goSerie: () => this.set({ view: 'serie' }),
+      goIdeation: () => this.set({ view: 'ideation' }),
+      goEpisode: () => this.set({ view: 'episode' }),
+      leaveWriting: () => this.set({ view: 'phase' }),
+
+      seriesCards: st.series.map((s) => ({
+        ...s, slotId: 'cover-' + s.id,
+        open: () => this.set({ view: 'serie', serieId: s.id }),
+      })),
+      newSerie: () => this.addSerie(),
+
+      serieTitle: serie.title,
+      serieSub: serie.kind + ' · ' + serieEps.length + ' episódios · ' + serieIdeas.length + ' ideias soltas',
+      ideaCount: serieIdeas.length,
+      pinCount: serieIdeas.filter((i) => i.pinned).length,
+      serieProgress: PHASES.map((p) => ({
+        title: p.title, color: p.color,
+        count: st.docs.filter((d) => { const e = epOf(d.ep); return e && e.serie === serie.id && d.phase === p.id; }).length,
+      })).filter((g) => g.count > 0),
+      episodes: serieEps.map((e) => {
+        const p = phaseOf(e.phase);
+        const stt = statusOf(e.status);
+        return {
+          ...e, color: p.color, ink: p.ink, phaseLabel: p.title,
+          statusLabel: stt.label, statusBg: stt.bg, statusFg: stt.fg,
+          dim: e.status === 'cut' ? '.5' : '1',
+          docLabel: (function (n) { return n === 1 ? '1 texto' : n + ' textos'; })(st.docs.filter((d) => d.ep === e.id).length),
+          open: () => this.set({ view: 'episode', episodeId: e.id }),
+        };
+      }),
+      newEpisode: () => this.addEpisode(serie.id),
+
+      draft: st.draft,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      onDraftKey: (e) => { if (e.key === 'Enter') this.addIdeaNow(); },
+      kinds: KINDS.map((k) => ({
+        label: k,
+        bg: st.draftKind === k ? '#2a1b12' : 'transparent',
+        fg: st.draftKind === k ? '#f7ecdc' : '#3a2318',
+        bc: st.draftKind === k ? '#2a1b12' : 'rgba(58,35,24,.22)',
+        pick: () => this.setState({ draftKind: k }),
+      })),
+      addIdea: () => this.addIdeaNow(),
+      filters: ['Todas', 'Destacadas'].concat(KINDS).map((f) => ({
+        label: f,
+        bg: st.filter === f ? '#2a1b12' : 'rgba(247,236,220,.55)',
+        fg: st.filter === f ? '#f7ecdc' : '#3a2318',
+        bc: st.filter === f ? '#2a1b12' : 'rgba(58,35,24,.2)',
+        pick: () => this.setState({ filter: f }),
+      })),
+      shownCount: sorted.length + (sorted.length === 1 ? ' ideia' : ' ideias'),
+      ideaCards: sorted.map((i) => ({
+        ...i,
+        shadow: i.pinned ? '0 18px 34px -16px rgba(35,18,9,.75), 0 0 0 3px #2a1b12' : '0 14px 30px -18px rgba(35,18,9,.7)',
+        pinBg: i.pinned ? '#2a1b12' : 'rgba(42,27,18,.1)',
+        pinFg: i.pinned ? '#f5c518' : 'rgba(42,27,18,.5)',
+        pinFill: i.pinned ? '#f5c518' : 'none',
+        pin: () => this.setState((s) => ({ ideas: s.ideas.map((x) => (x.id === i.id ? { ...x, pinned: !x.pinned } : x)) })),
+        promote: () => this.addEpisode(serie.id, i.text.length > 42 ? i.text.slice(0, 42) + '…' : i.text, i.text),
+      })),
+
+      episodeTitle: 'ep. ' + episode.num + ' — ' + episode.title,
+      phaseCards: PHASES.map((p) => {
+        const n = epDocs.filter((d) => d.phase === p.id).length;
+        return {
+          ...p,
+          locked: !!p.locked && n > 0,
+          slotId: 'phase-' + p.id,
+          artHint: 'personagem de "' + p.title + '" (PNG)',
+          status: p.id === 'brainstorm' ? this.wallFor('ep:' + episode.id).notes.length + ' post-its' : p.id === 'plan' ? ((st.plans['ep:' + episode.id] || {}).escaleta || (episode.id === 'e1' ? ESC_SEED : [])).length + ' cenas na escaleta' : n ? n + (n === 1 ? ' texto' : ' textos') : 'vazia',
+          open: () => {
+            if (p.id === 'brainstorm') this.set({ view: 'plan', planScope: 'episode', boardTab: 'postits', wallFull: true });
+            else if (p.id === 'plan') this.set({ view: 'plan', planScope: 'episode', boardTab: 'anatomia', wallFull: false });
+            else this.set({ view: 'phase', phaseId: p.id });
+          },
+        };
+      }),
+
+      phaseTitle: phase.title, phaseDesc: phase.desc, phaseColor: phase.color, phaseInk: phase.ink,
+      phaseLocked: !!phase.locked && epDocs.filter((d) => d.phase === phase.id).length > 0,
+      newDocLabel: 'Novo ' + phase.noun,
+      newDoc: () => {
+        const id = 'd' + Date.now();
+        this.setState((s) => ({
+          docs: s.docs.concat([{ id, ep: s.episodeId, phase: s.phaseId, title: phase.noun + ' sem título', format: 'Roteiro', meta: 'vazio · criado agora', seed: blk('scene', 'INT. ') }]),
+          docId: id, view: 'writing', linkFor: null, saveOpen: false,
+        }));
+      },
+      phaseDocs: epDocs.filter((d) => d.phase === phase.id).map((d) => this.docCard(d)),
+      allDocs: st.docs.map((d) => this.docCard(d)),
+
+      lockLeft: days + 'd ' + p2((left % 864e5) / 36e5) + 'h',
+      clock: [
+        { v: p2(days), l: 'dias' },
+        { v: p2((left % 864e5) / 36e5), l: 'horas' },
+        { v: p2((left % 36e5) / 6e4), l: 'min' },
+        { v: p2((left % 6e4) / 1000), l: 'seg' },
+      ],
+      durations: DURATIONS,
+      maturingOthers: st.docs.filter((d) => d.phase === 'maturacao').map((d) => ({ title: d.title, left: '3d 06h' })),
+
+      columns: PHASES.map((p) => ({
+        title: p.title, color: p.color,
+        count: st.docs.filter((d) => d.phase === p.id).length,
+        cards: st.docs.filter((d) => d.phase === p.id).map((d) => {
+          const e = epOf(d.ep);
+          const s = e && st.series.find((x) => x.id === e.serie);
+          return { title: d.title, meta: s ? s.title + ' · ep. ' + e.num : d.meta, open: this.openDoc(d.id) };
+        }),
+      })),
+
+      docTitle: doc.title,
+      docChip: docPhase ? docPhase.title : 'sem fase',
+      docChipBg: docPhase ? docPhase.color : 'rgba(58,35,24,.12)',
+      docChipFg: docPhase ? docPhase.ink : 'rgba(42,27,18,.7)',
+      docSub: (docSerie ? docSerie.title + ' · ep. ' + docEp.num + ' · ' : '') + doc.format,
+      saveOpen: st.saveOpen,
+      toggleSave: () => this.setState((s) => ({ saveOpen: !s.saveOpen })),
+      saveOptions: [
+        { label: 'Texto (.txt)', hint: 'formatação de roteiro em espaços', run: this.saveAs('txt') },
+        { label: 'Fountain (.fountain)', hint: 'abre em Final Draft, Highland, Arc', run: this.saveAs('fountain') },
+        { label: 'Página (.html)', hint: 'mantém negrito, itálico e margens', run: this.saveAs('html') },
+      ],
+      onInput: this.onInput, onKeyDown: this.onKeyDown,
+      marks: MARKS.map((m) => ({ ...m, run: this.mark(m.cmd) })),
+      blocks: BLOCK_BTNS.map((b) => ({
+        label: b.label, hint: b.hint,
+        bg: b.hot ? '#fff3b8' : 'transparent', bc: b.hot ? '#c98f00' : 'rgba(58,35,24,.24)', fg: b.hot ? '#5a3e00' : '#3a2318',
+        run: (e) => { e.preventDefault(); this.apply(b.t, b.prefix); },
+      })),
+      sceneList: st.sceneTitles.map((t, i) => ({ num: p2(i + 1), title: t, jump: this.jumpScene(i) })),
+      siblings: st.docs.filter((d) => d.ep === doc.ep && d.phase === doc.phase).map((d) => ({
+        title: d.title,
+        bg: d.id === doc.id ? 'rgba(58,35,24,.14)' : 'transparent',
+        open: this.openDoc(d.id),
+      })),
+      words: st.words, pages: st.pages, sceneCount: st.sceneTitles.length, savedLabel: st.saved,
+      panelOpen: st.panel !== false,
+      panelBg: st.panel !== false ? 'rgba(58,35,24,.12)' : 'transparent',
+      togglePanel: () => this.setState((s) => ({ panel: s.panel === false })),
+      panelLabel: st.panel !== false ? 'Esconder painel' : 'Mostrar painel',
+      panelHidden: st.panel === false,
+      openLinkPick: this.openLinkPick,
+      stopClick: (e) => e.stopPropagation(),
+      onEditorClick: this.onEditorClick,
+      linkPick: !!st.linkPick,
+      closeLinkPick: () => this.setState({ linkPick: false }),
+      linkQuery: st.linkQuery || '',
+      onLinkQuery: (e) => this.setState({ linkQuery: e.target.value }),
+      linkTargets: (st.linkPick ? this.linkTargets(docSerie || serie, docEp) : []).filter((x) => !st.linkQuery || (x.label + ' ' + x.group).toLowerCase().indexOf(st.linkQuery.toLowerCase()) >= 0).map((x) => ({ label: x.label, group: x.group, color: x.color, pick: () => this.insertLink(x.t) })),
+      linkPop: !!st.linkPop,
+      linkPopX: st.linkPop ? st.linkPop.x + 'px' : '0px',
+      linkPopY: st.linkPop ? st.linkPop.y + 'px' : '0px',
+      linkPopLabel: st.linkPop ? st.linkPop.t.label : '',
+      linkPopKind: st.linkPop ? ({ note: 'Post-it', stage: 'Jornada do herói', beat: 'Linha do tempo · 3 atos', episode: 'Episódio', idea: 'Ideia' })[st.linkPop.t.type] || 'Ligação' : '',
+      linkPopPreview: st.linkPop ? this.linkPreview(st.linkPop.t) : '',
+      followPop: () => st.linkPop && this.followLink(st.linkPop.t),
+      removePop: () => { if (this.popNode) { this.popNode.remove(); this.popNode = null; this.onInput(); } this.setState({ linkPop: null }); },
+      closePop: () => this.setState({ linkPop: null }),
+      hasReturn: !!st.returnTo && v !== 'writing',
+      returnLabel: st.returnTo ? st.returnTo.label : '',
+      goBack: this.goBack,
+    };
+  }
+
+  addIdeaNow() {
+    const text = (this.state.draft || '').trim();
+    if (!text) return;
+    const palette = ['#f4e08a', '#f4b7c0', '#b9e0a5', '#a8d0e6', '#c9b6e4', '#f2b26b'];
+    this.setState((s) => ({
+      ideas: [{
+        id: 'i' + Date.now(), serie: s.serieId, kind: s.draftKind, text,
+        when: 'agora', bg: palette[s.ideas.length % palette.length],
+        rot: (s.ideas.length % 2 ? '1.2deg' : '-1.1deg'), pinned: false,
+      }].concat(s.ideas),
+      draft: '',
+    }));
+  }
+}
+
+</script>
+</body>
+</html>
